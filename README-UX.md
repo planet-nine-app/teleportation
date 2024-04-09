@@ -17,6 +17,8 @@ Only 5% of websites get more than ten hits from search a month, and 90% of websi
 From a UX perspective, navigating to a website, entering text, hoping what I want shows up, navigating to a landing page, trying to figure out where to go to get what I want, getting frustrated and heading back to search, putting in something more specific, having the same results come up in a diferent order... well you get the idea.
 It's bad.
 
+## The Problem
+
 But not much is made about how anti-consumer *and* anti-business it is. 
 
 Google ads are served through an auction process.
@@ -101,3 +103,54 @@ Web crawlers find these tags and propogate them to teleportals.
 Teleportals connect users to this content.
 
 Together with [Sessionless](https://github.com/planet-nine-app/sessionless) and [MAGIC](https://github.com/planet-nine-app/MAGIC), purchases can be made *without* ever travelling to the site. 
+
+## What else can teleportation do?
+
+Fundamentally teleportation is about connecting parts of the internet directly together without needing to go through the central hub that is Google.
+So one of the great things it can do is aggregate types of things. 
+Ever try to find out who's playing a show in your city this weekend?
+Just connect to your city's local events teleportal and see.
+
+Friend asks you for the pest guy you used last summer?
+Text them their contact with a teleportal to book.
+
+You know what's dumb? 
+Affiliate links.
+A blogger writes something cool, links to Amazon to sell some things, Amazon gets a backlink and some sales, and finds any way they can to not pay the blogger for sales made from their blog.
+And the reader has to leave the blog, navigate *all* of Amazon's sales process, and then what?
+
+I don't know why, but I've always been fascinated by the climbing carabiner market. 
+They're a life or death purchase that neophytes know nothing about, making them perfect for people to share their expertise online about.
+They're also not a huge market, so there's less crowding out from big names. 
+In fact a search for "best carabiners" turns up a blog on the first page!
+
+## Craigslist
+
+Craigslist is easily one of the most useful sites on the internet, and yet it almost never shows up in searches on any of the search engines.
+For Google I'm sure this has something to do with them seeing Craigslist as a competitor, but it is also because as a link aggregator, Craigslist can prevent bots from spamming their site with links to game search engine algorithms.
+With teleportation, Craigslist just needs to wrap its entries in html tags. 
+Whether they do or not is up to them of course, but the point is the protocol is non-competitive.
+
+It's additive to what everyone has already built.
+
+## But how does it work?
+
+So teleportation uses [Sessionless](www.github.com/planet-nine-app/sessionless), and [MAGIC](www.github.com/planet-nine-app/MAGIC) to allow one tap/click interactions with teleported elements.
+This can be to buy, sign up, join a meetup, subscribe... really any interaction you can do on the internet, teleportation, Sessionless, and MAGIC can do. 
+
+Maybe it's better to see a demo:
+
+<Cool demo here>
+
+## Use Cases
+
+* Delivery Apps
+* eCommerce of course
+* Twitch Streaming
+* Job Searching
+* Federated server searching
+* Multiple context apps
+* events and meetups
+* activities
+* classes
+* restaurants
