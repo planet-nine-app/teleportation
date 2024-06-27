@@ -11,10 +11,9 @@ Teleportation fits easily into existing web stacks, and is meant to deliver a fa
 Resources on the internet are mapped to URIs. 
 These URIs let our browsers traverse from one computer to another to whereever that resource is physically located.
 Often times the resource at these locations will pull in other resources.
-Because *discovery* of these URIs is done almost entirely through search engines, of which 80%+ is Google.
-Only 5% of websites get more than ten hits from search a month, and 90% of websites get no hits at all.
+Because *discovery* of these URIs is done almost entirely through search engines, of which 80%+ is Google, only 5% of websites get more than ten hits from search a month, and 90% of websites get no hits at all.
 
-From a UX perspective, navigating to a website, entering text, hoping what I want shows up, navigating to a landing page, trying to figure out where to go to get what I want, getting frustrated and heading back to search, putting in something more specific, having the same results come up in a diferent order... well you get the idea.
+From a UX perspective, navigating to a search website, entering text, hoping what I want shows up, navigating to a landing page, trying to figure out where to go to get what I want, getting frustrated and heading back to search, putting in something more specific, having the same results come up in a diferent order... well you get the idea.
 It's bad.
 
 ## The Problem
@@ -32,7 +31,7 @@ And to do that we need to take a look at a shopping experience.
 ## The search
 
 So I start by typing "black men's socks" into the search bar of DuckDuckGo.
-I scroll eight pages (only 0.63% of searchers ever make it to page two) to find a link to a company that isn't a huge national brand. 
+I scroll eight pages (only 0.63% of searchers ever make it to page two) to find the first link that's to a company that isn't a huge national brand. 
 Amazingly this brand's name is Black Socks. 
 Perfect!
 Here's what I'm met with:
@@ -122,7 +121,10 @@ And the reader has to leave the blog, navigate *all* of Amazon's sales process, 
 I don't know why, but I've always been fascinated by the climbing carabiner market. 
 They're a life or death purchase that neophytes know nothing about, making them perfect for people to share their expertise online about.
 They're also not a huge market, so there's less crowding out from big names. 
-In fact a search for "best carabiners" turns up a blog on the first page!
+In fact a search for "best carabiners" turns up [a blog on the first page!].
+
+Click on one of those affiliate links, and what do you know, the product's out of stock. 
+So now I have to check inventory n Amazon, and update my site to get a couple nickels helping people not fall off a mountain?
 
 ## Craigslist
 
@@ -131,7 +133,7 @@ For Google I'm sure this has something to do with them seeing Craigslist as a co
 With teleportation, Craigslist just needs to wrap its entries in html tags. 
 Whether they do or not is up to them of course, but the point is the protocol is non-competitive.
 
-It's additive to what everyone has already built.
+**It's additive to what everyone has already built.**
 
 ## But how does it work?
 
@@ -154,3 +156,5 @@ Maybe it's better to see a demo:
 * activities
 * classes
 * restaurants
+
+[a blog on the first page!]: https://www.thewanderingclimber.com/best-rock-climbing-carabiners/
