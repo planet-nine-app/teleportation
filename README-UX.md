@@ -36,7 +36,7 @@ Amazingly this brand's name is Black Socks.
 Perfect!
 Here's what I'm met with:
 
-![A landing page with lots of clutter, and no black socks.](https://github.com/zach-planet-nine/teleportation/blob/main/black-socks-landing-page.png)
+![A landing page with lots of clutter, and no black socks.](https://github.com/planet-nine-app/teleportation/blob/main/black-socks-landing-page.png)
 
 Ah, 
 
@@ -66,7 +66,7 @@ Well what if we didn't need to change it, but could enhance it?
 
 Here's the black socks selection page:
 
-![Black socks finally found, more things to select.](https://github.com/zach-planet-nine/teleportation/blob/main/black-socks-selection.png)
+![Black socks finally found, more things to select.](https://github.com/planet-nine-app/teleportation/blob/main/black-socks-selection.png)
 
 That nice juicy black socks image on the left is represented in html like this:
 
