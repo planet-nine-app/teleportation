@@ -70,6 +70,7 @@ Here's the black socks selection page:
 
 That nice juicy black socks image on the left is represented in html like this:
 
+```html
 <div class="product-image-figure-wrapper">
   <figure data-height="1034" data-width="776" class="field field-name-field-product-image field-type-image field-label-hidden">
     <a href="/files/Wadensocken_schwarz.png">
@@ -77,6 +78,7 @@ That nice juicy black socks image on the left is represented in html like this:
     </a> 
   </figure>
 </div>
+```
 
 That actual page is made up of 6000 lines of HTML and JavaScript, and a couple dozen other scripts to handle tracking, and tagging, and analytics, and blah blah blah.
 And now let's all pretend like we live somewhere where our phones are our main gateway to the internet, and unlimited data isn't the norm.
@@ -86,6 +88,7 @@ What I want are those three tags above with the image of black socks, and maybe 
 Why can't I do that?
 Why can't I just teleport the socks from the site to my phone?
 
+```
 <teleport id="tlpt:uuid" categories="men black socks">
   <div class="product-image-figure-wrapper">
     <figure data-height="1034" data-width="776" class="field field-name-field-product-image field-type-image field-label-hidden">
@@ -95,6 +98,7 @@ Why can't I just teleport the socks from the site to my phone?
     </figure>
   </div>
 </teleport>
+```
 
 This is all teleportation adds to your site. 
 Two wrapping tags that do nothing to your site whatsoever.
