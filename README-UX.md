@@ -88,7 +88,7 @@ What I want are those three tags above with the image of black socks, and maybe 
 Why can't I do that?
 Why can't I just teleport the socks from the site to my phone?
 
-```
+```html
 <teleport id="tlpt:uuid" categories="men black socks">
   <div class="product-image-figure-wrapper">
     <figure data-height="1034" data-width="776" class="field field-name-field-product-image field-type-image field-label-hidden">
