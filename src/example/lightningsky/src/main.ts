@@ -6,6 +6,7 @@ let greetInputEl: HTMLInputElement | null;
 let greetMsgEl: HTMLElement | null;
 
 const greet = async () => {
+    greetMsgEl.textContent = 'getting here at least';
   if (greetMsgEl && greetInputEl) {
     // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
     greetMsgEl.textContent = await invoke("greet", {
@@ -19,13 +20,27 @@ const greet = async () => {
       identifier: config.email,
       password: config.password
     });
-    await agent.post({
+/*    await agent.post({
       text: "Once this works, all bets are off. #planetnineisablueskydevnow",
       createdAt: new Date().toISOString()
+    });*/
+/*    const feed = await agent.getTimeline({
+      limit: 5
+    });*/
+//greetMsgEl.textContent = "nothing went wrong at least " + JSON.stringify(feed);
+
+    const teleportedHTML = await invoke("get_teleported_html", {
+      url: "http://localhost:2970/safe-parser.html"
     });
-greetMsgEl.textContent = "nothing went wrong at least";
+
+greetMsgEl.textContent = "nothing went wrong at least " + teleportedHTML;
+
+    const foo = document.createElement('div');
+    foo.innerHTML = teleportedHTML;
+    document.appendChild(foo);
+
     } catch(err) {
-greetMsgEl.textContent = err;
+//greetMsgEl.textContent = err;
     }
   }
 };
