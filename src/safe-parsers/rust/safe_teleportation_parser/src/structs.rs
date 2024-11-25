@@ -1,43 +1,49 @@
 use scraper::{Html, Selector, ElementRef};
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
+use regex::{Regex};
 
-#[derive(Debug, Serialize, Deserialize)]
 pub struct TeleportTag {
     pub signature: String,
     pub teleporter_pub_key: String, 
     pub teleportal_pub_key: String,
-    pub html: HTML
+    pub html: Html
 }
 
 impl TeleportTag {
-    pub fn new(resp: &str) -> Self {
-        let safe_html = remove_javascript(&resp);
+    pub fn new(resp: Option<String>) -> Self {
+        let unwrapped_response = resp.unwrap_or("".to_string());
+
+        let safe_html = remove_javascript(&unwrapped_response);
         let document = Html::parse_document(&safe_html);
         let selector = Selector::parse("teleport").unwrap();
-        let teleport_tags = document.select(&selector);
 
-        if teleport_tags.len() > 0 {
-            let teleport_tag = teleport_tags[0];
-
-	     let attributes = teleport_tag
+        if let Some(teleport_tag) = document.select(&selector).next() {
+	     let attributes: HashMap<String, String> = teleport_tag
 		.value()
 		.attrs()
 		.map(|(k, v)| (k.to_string(), v.to_string()))
 		.collect();
 	       
-             let signature = attributes["signature"];
-             let teleporter_pub_key = attributes["teleporterPubKey"];
-             let teleportal_pub_key = attributes["teleportalPubKey"];
+             let empty_string = "".to_string();
+             let signature = attributes.get("signature").unwrap_or(&empty_string);
+             let teleporter_pub_key = attributes.get("teleporterPubKey").unwrap_or(&empty_string);
+             let teleportal_pub_key = attributes.get("teleportalPubKey").unwrap_or(&empty_string);
 
              Self {
-                 signature,
-                 teleporter_pub_key,
-                 teleportal_pub_key,
+                 signature: signature.to_string(),
+                 teleporter_pub_key: teleporter_pub_key.to_string(),
+                 teleportal_pub_key: teleportal_pub_key.to_string(),
                  html: document
              }
+        } else {
+            Self {
+                signature: "".to_string(),
+                teleporter_pub_key: "".to_string(),
+                teleportal_pub_key: "".to_string(),
+                html: document
+            }
         }
-
     }
 }
 
@@ -67,29 +73,17 @@ fn remove_javascript(html: &str) -> String {
         "onwebkitanimationstart", "onwebkittransitionend", "onwheel"
     ];
 
+    let mut content = document.root_element().html();
+
     if let Ok(script_selector) = Selector::parse("script") {
-        document.select(&script_selector)
-            .collect::<Vec<_>>()
-            .iter()
-            .for_each(|element| element.remove());
+        for element in document.select(&script_selector) {
+            content = content.replace(&element.html(), "");
+        }
     }
 
     if let Ok(noscript_selector) = Selector::parse("noscript") {
-        document.select(&noscript_selector)
-            .collect::<Vec<_>>()
-            .iter()
-            .for_each(|element| element.remove());
-    }
-
-    for event in js_events.iter() {
-        if let Ok(selector) = Selector::parse(&format!("[{}]", event)) {
-            document.select(&selector)
-                .collect::<Vec<_>>()
-                .iter()
-                .for_each(|element| {
-                    let mut element = element.clone();
-                    element.remove_attribute(event);
-                });
+        for element in document.select(&noscript_selector) {
+            content = content.replace(&element.html(), "");
         }
     }
 
@@ -104,7 +98,7 @@ fn remove_javascript(html: &str) -> String {
                 for attr in ["href", "src", "data"].iter() {
                     if let Some(value) = element.value().attr(attr) {
                         if js_url_regex.is_match(value.trim()) {
-                            element.remove_attribute(attr);
+                            content = content.replace(&element.html(), "");
                         }
                     }
                 }
@@ -121,12 +115,12 @@ fn remove_javascript(html: &str) -> String {
                 let mut element = element.clone();
                 if let Some(style) = element.value().attr("style") {
                     if expression_regex.is_match(style) {
-                        element.remove_attribute("style");
+                        content = content.replace(&element.html(), "");
                     }
                 }
             });
     }
 
-    document.html()
+    content
 }
 
