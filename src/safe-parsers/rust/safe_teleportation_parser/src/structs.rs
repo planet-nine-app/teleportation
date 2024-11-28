@@ -39,8 +39,8 @@ impl TeleportTag {
         } else {
             Self {
                 signature: "".to_string(),
+                message: "".to_string(),
                 teleporter_pub_key: "".to_string(),
-                teleportal_pub_key: "".to_string(),
                 html: document
             }
         }

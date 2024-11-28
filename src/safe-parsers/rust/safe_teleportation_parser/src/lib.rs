@@ -17,13 +17,19 @@ pub struct SafeTeleportationTag {
     pub teleportal_pub_key: String
 }
 
+fn get_teleportal_pub_key(url: &String) -> Option<String> {
+  let teleportal_pub_key = url.split('?')
+          .nth(1)?
+          .split('&')
+          .find(|pair| pair.starts_with("pubKey="))
+          .map(|pair| pair.split('=').nth(1).unwrap_or("").to_string());
+
+  teleportal_pub_key
+}
+
 impl SafeTeleportationTag {
     pub async fn new(url: String) -> Self {
-        let teleportal_pub_key = url.split('?')
-	  .nth(1)?
-	  .split('&')
-	  .find(|pair| pair.starts_with("pubKey="))
-	  .map(|pair| pair.split('=').nth(1).unwrap_or("").to_string());
+        let teleportal_pub_key = get_teleportal_pub_key(&url).unwrap_or("".to_string());
 
         let html_content = match reqwest::get(&url).await {
 	    Ok(r) => r.text().await.unwrap_or_else(|_| "".to_string()),
