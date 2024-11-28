@@ -13,11 +13,18 @@ use crate::structs::{TeleportTag};
 
 pub struct SafeTeleportationTag {
     pub url: String,
-    pub teleport_tag: TeleportTag
+    pub teleport_tag: TeleportTag,
+    pub teleportal_pub_key: String
 }
 
 impl SafeTeleportationTag {
     pub async fn new(url: String) -> Self {
+        let teleportal_pub_key = url.split('?')
+	  .nth(1)?
+	  .split('&')
+	  .find(|pair| pair.starts_with("pubKey="))
+	  .map(|pair| pair.split('=').nth(1).unwrap_or("").to_string());
+
         let html_content = match reqwest::get(&url).await {
 	    Ok(r) => r.text().await.unwrap_or_else(|_| "".to_string()),
 	    Err(_) => "bop".to_string()
@@ -27,7 +34,8 @@ impl SafeTeleportationTag {
 
         Self {
             url,
-            teleport_tag
+            teleport_tag,
+            teleportal_pub_key
         }
     }
 

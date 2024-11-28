@@ -7,11 +7,8 @@ let greetMsgEl: HTMLElement | null;
 
 const greet = async () => {
     greetMsgEl.textContent = 'getting here at least';
-  if (greetMsgEl && greetInputEl) {
+  if (greetMsgEl && true) {
     // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    greetMsgEl.textContent = await invoke("greet", {
-      name: greetInputEl.value,
-    });
     try {
     const agent = new BskyAgent({
       service: 'https://bsky.social'
@@ -24,12 +21,22 @@ const greet = async () => {
       text: "Once this works, all bets are off. #planetnineisablueskydevnow",
       createdAt: new Date().toISOString()
     });*/
-/*    const feed = await agent.getTimeline({
+    const feed = await agent.getTimeline({
       limit: 5
-    });*/
-//greetMsgEl.textContent = "nothing went wrong at least " + JSON.stringify(feed);
+    });
+    feed.data.feed.forEach(item => {
+      let postHTML = `
+        <h3>${item.post.author.displayName}</h3>
+        <br>
+        <p>${item.post.record.text}</p>
+      `;
+      const postDiv = document.createElement('div');
+      postDiv.innerHTML = postHTML;
+      document.getElementById('feed').appendChild(postDiv);
+    });
+greetMsgEl.textContent = "nothing went wrong at least " + JSON.stringify(feed.data.feed.length);
 
-    const teleportedHTML = await invoke("get_teleported_html", {
+/*    const teleportedHTML = await invoke("get_teleported_html", {
       url: "http://localhost:2970/safe-parser.html"
     });
 
@@ -37,7 +44,7 @@ greetMsgEl.textContent = "nothing went wrong at least " + teleportedHTML;
 
     const foo = document.createElement('div');
     foo.innerHTML = teleportedHTML;
-    document.appendChild(foo);
+    document.appendChild(foo);*/
 
     } catch(err) {
 //greetMsgEl.textContent = err;
@@ -46,9 +53,8 @@ greetMsgEl.textContent = "nothing went wrong at least " + teleportedHTML;
 };
 
 window.addEventListener("DOMContentLoaded", () => {
-  greetInputEl = document.querySelector("#greet-input");
   greetMsgEl = document.querySelector("#greet-msg");
-  document.querySelector("#greet-form")?.addEventListener("submit", (e) => {
+  document.querySelector("#get-feed")?.addEventListener("click", (e) => {
     e.preventDefault();
     greet();
   });

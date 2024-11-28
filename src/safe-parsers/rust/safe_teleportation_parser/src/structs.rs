@@ -6,7 +6,7 @@ use regex::{Regex};
 pub struct TeleportTag {
     pub signature: String,
     pub teleporter_pub_key: String, 
-    pub teleportal_pub_key: String,
+    pub message: String,
     pub html: Html
 }
 
@@ -28,12 +28,12 @@ impl TeleportTag {
              let empty_string = "".to_string();
              let signature = attributes.get("signature").unwrap_or(&empty_string);
              let teleporter_pub_key = attributes.get("teleporterPubKey").unwrap_or(&empty_string);
-             let teleportal_pub_key = attributes.get("teleportalPubKey").unwrap_or(&empty_string);
+             let message = attributes.get("message").unwrap_or(&empty_string);
 
              Self {
                  signature: signature.to_string(),
                  teleporter_pub_key: teleporter_pub_key.to_string(),
-                 teleportal_pub_key: teleportal_pub_key.to_string(),
+                 message: message.to_string(),
                  html: document
              }
         } else {
