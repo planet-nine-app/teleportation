@@ -7,7 +7,8 @@ use reqwest::{Client, Response};
 use scraper::{Html, Selector, ElementRef};
 use serde::{Deserialize, Serialize};
 use sessionless::hex::IntoHex;
-use sessionless::{Sessionless, Signature};
+use sessionless::hex::FromHex;
+use sessionless::{Sessionless, Signature, PublicKey};
 use std::collections::HashMap;
 use crate::structs::{TeleportTag};
 
@@ -51,11 +52,25 @@ impl SafeTeleportationTag {
             teleportal_pub_key
         }
     }
+
+    pub fn is_valid_tag(&self) -> bool {
+        let sessionless = Sessionless::new();
+        let pub_key = match PublicKey::from_hex(&self.teleporter_pub_key) {
+	    Ok(key) => key,
+	    Err(_) => return false,
+	};
+	
+	let signature = match Signature::from_hex(&self.signature) {
+	    Ok(sig) => sig,
+	    Err(_) => return false,
+	};
+
+	sessionless.verify(&self.message, &pub_key, &signature).is_ok()
+    }
 }
 
 pub fn get_inner_html(teleport_tag: &TeleportTag) -> String {
     let selector = Selector::parse("teleport").unwrap();
-dbg!(&teleport_tag.html);
     if let Some(teleported) = teleport_tag.html.select(&selector).next() {
 	teleported.inner_html()
     } else {

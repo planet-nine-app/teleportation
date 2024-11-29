@@ -27,7 +27,7 @@ impl TeleportTag {
 	       
              let empty_string = "".to_string();
              let signature = attributes.get("signature").unwrap_or(&empty_string);
-             let teleporter_pub_key = attributes.get("teleporterPubKey").unwrap_or(&empty_string);
+             let teleporter_pub_key = attributes.get("pubkey").unwrap_or(&empty_string);
              let message = attributes.get("message").unwrap_or(&empty_string);
 
              Self {

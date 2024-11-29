@@ -9,8 +9,10 @@ fn greet(name: &str) -> String {
 #[tauri::command]
 async fn get_teleported_html(url: String) -> Result<SafeTeleportationTag, String> {
     let safe_teleportation_tag = SafeTeleportationTag::new(url).await;
-//    let teleported_html = safe_teleportation_tag.get_inner_html();
-    Ok(safe_teleportation_tag)
+    match safe_teleportation_tag.is_valid_tag() {
+        true => Ok(safe_teleportation_tag),
+        false => Ok(SafeTeleportationTag::new("https://www.example.com".to_string()).await)
+    }
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

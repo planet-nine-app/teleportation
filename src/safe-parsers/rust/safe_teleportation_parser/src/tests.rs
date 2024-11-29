@@ -7,9 +7,10 @@ use serde_json::Value;
 #[actix_rt::test]
 async fn test_safe_teleportation_parser() {
 
-    let safe_teleportation_tag = SafeTeleportationTag::new("http://localhost:2970/safe-parser.html".to_string()).await;
+    let bad_tag = SafeTeleportationTag::new("http://localhost:2970/safe-parser.html".to_string()).await;
+    let good_tag = SafeTeleportationTag::new("http://localhost:2970/safe-parser-with-the-goods.html".to_string()).await;
 
-    async fn get_teleportation_html(tag: &SafeTeleportationTag) -> Option<String> {
+    async fn check_teleportation_html(tag: &SafeTeleportationTag) -> Option<String> {
         let html_as_string = tag.html.clone();
 
 dbg!(&html_as_string);
@@ -22,6 +23,32 @@ dbg!(&html_as_string);
         Some(html_as_string)
     }
 
-    get_teleportation_html(&safe_teleportation_tag).await;
+    fn check_bad_tag(tag: &SafeTeleportationTag) -> bool {
+        let is_valid = tag.is_valid_tag();
+        
+        assert_eq!(
+            is_valid,
+            false
+        );
+ 
+        is_valid
+    }
+
+    fn check_good_tag(tag: &SafeTeleportationTag) -> bool {
+        let is_valid = tag.is_valid_tag();
+        
+        assert_eq!(
+            is_valid,
+            true
+        );
+ 
+        is_valid
+    }
+
+    check_teleportation_html(&bad_tag).await;
+    check_teleportation_html(&good_tag).await;
+
+    check_bad_tag(&bad_tag);
+    check_good_tag(&good_tag);
 }
 
