@@ -11,9 +11,13 @@ use sessionless::{Sessionless, Signature};
 use std::collections::HashMap;
 use crate::structs::{TeleportTag};
 
+#[derive(Serialize, Deserialize)]
 pub struct SafeTeleportationTag {
     pub url: String,
-    pub teleport_tag: TeleportTag,
+    pub signature: String,
+    pub teleporter_pub_key: String,
+    pub message: String,
+    pub html: String,
     pub teleportal_pub_key: String
 }
 
@@ -40,17 +44,21 @@ impl SafeTeleportationTag {
 
         Self {
             url,
-            teleport_tag,
+            html: get_inner_html(&teleport_tag),
+            signature: teleport_tag.signature,
+            teleporter_pub_key: teleport_tag.teleporter_pub_key,
+            message: teleport_tag.message,
             teleportal_pub_key
         }
     }
+}
 
-    pub fn get_inner_html(&self) -> String {
-        let selector = Selector::parse("teleport").unwrap();
-        if let Some(teleported) = self.teleport_tag.html.select(&selector).next() {
-            teleported.inner_html()
-        } else {
-            "".to_string()
-        }
+pub fn get_inner_html(teleport_tag: &TeleportTag) -> String {
+    let selector = Selector::parse("teleport").unwrap();
+dbg!(&teleport_tag.html);
+    if let Some(teleported) = teleport_tag.html.select(&selector).next() {
+	teleported.inner_html()
+    } else {
+	"foo".to_string()
     }
 }

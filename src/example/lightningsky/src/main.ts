@@ -2,54 +2,75 @@ import { invoke } from "@tauri-apps/api/core";
 import { BskyAgent } from "@atproto/api";
 import config from "./config.json";
 
+const LINK_TYPE = "app.bsky.richtext.facet#link";
 let logger: HTMLElement | null;
-
-
 
 const getFeed = async () => {
 logger.textContent = 'getting here at least';
-    try {
-      const agent = new BskyAgent({
-	service: 'https://bsky.social'
-      });
-      const session = await agent.login({
-	identifier: config.email,
-	password: config.password
-      });
-      const feed = await agent.getAuthorFeed({
-	actor: agent.did,
-	limit: 5
-      });
-      feed.data.feed.forEach(item => {
-	let postHTML = `
-	  <h3>${item.post.author.displayName}</h3>
-	  <br>
-	  <p>${item.post.record.text}</p>
-	`;
-	const postDiv = document.createElement('div');
-	postDiv.innerHTML = postHTML;
-	document.getElementById('feed').appendChild(postDiv);
-  console.log(item);
-  logger.textContent = logger.textContent + '\n' + item.post.record.text;
-      });
+  try {
+    const agent = new BskyAgent({
+      service: 'https://bsky.social'
+    });
+    const session = await agent.login({
+      identifier: config.email,
+      password: config.password
+    });
+    const feed = await agent.getAuthorFeed({
+      actor: agent.did,
+      limit: 5
+    });
+    feed.data.feed.forEach(async item => {
+      let teleportedURI;
 
-  // get facets, check facets for uris, check uris for teleport tags, render teleport tags
+      let postHTML = `
+	<h3>${item.post.author.displayName}</h3>
+	<br>
+	<p>${item.post.record.text}</p>
+      `;
 
-  logger.textContent = logger.textContent + '\n' + "nothing went wrong at least " + JSON.stringify(feed.data.feed.length);
-
-  /*    const teleportedHTML = await invoke("get_teleported_html", {
-	url: "http://localhost:2970/safe-parser.html"
+      item.post.record.facets.forEach(facet => {
+//logger.textContent += '\n' + JSON.stringify(facet) + '\n';
+        facet.features && facet.features.forEach(feature => {
+	  if(feature.$type === LINK_TYPE) {
+logger.textContent += '<br>Should set a uri<br>';
+	    teleportedURI = feature.uri;
+	  }
+        });
       });
 
-  logger.textContent = "nothing went wrong at least " + teleportedHTML;
+      if(teleportedURI) {
+	const teleportTag = await invoke("get_teleported_html", {
+	  url: teleportedURI
+	});    
+console.log('teleportTag', teleportTag);
+	if(teleportTag.html !== "") {
+	  postHTML += teleportTag.html;; 
+	}
+      } 
 
-      const foo = document.createElement('div');
-      foo.innerHTML = teleportedHTML;
-      document.appendChild(foo);*/
+      const postDiv = document.createElement('div');
+      postDiv.innerHTML = postHTML;
+      document.getElementById('feed').appendChild(postDiv);
+console.log(item);
+logger.textContent = logger.textContent + '\n' + item.post.record.text;
+    });
 
-    } catch(err) {
+// get facets, check facets for uris, check uris for teleport tags, render teleport tags
+
+logger.textContent = logger.textContent + '\n' + "nothing went wrong at least " + JSON.stringify(feed.data.feed.length);
+
+/*    const teleportedHTML = await invoke("get_teleported_html", {
+      url: "http://localhost:2970/safe-parser.html"
+    });
+
+logger.textContent = "nothing went wrong at least " + teleportedHTML;
+
+    const foo = document.createElement('div');
+    foo.innerHTML = teleportedHTML;
+    document.appendChild(foo);*/
+
+  } catch(err) {
 logger.textContent = err;
-    }
   }
 };
 

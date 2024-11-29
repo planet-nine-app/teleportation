@@ -10,7 +10,7 @@ async fn test_safe_teleportation_parser() {
     let safe_teleportation_tag = SafeTeleportationTag::new("http://localhost:2970/safe-parser.html".to_string()).await;
 
     async fn get_teleportation_html(tag: &SafeTeleportationTag) -> Option<String> {
-        let html_as_string = tag.get_inner_html();
+        let html_as_string = tag.html.clone();
 
 dbg!(&html_as_string);
 

@@ -7,10 +7,10 @@ fn greet(name: &str) -> String {
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
-async fn get_teleported_html(url: String) -> String {
+async fn get_teleported_html(url: String) -> Result<SafeTeleportationTag, String> {
     let safe_teleportation_tag = SafeTeleportationTag::new(url).await;
-    let teleported_html = safe_teleportation_tag.get_inner_html();
-    teleported_html
+//    let teleported_html = safe_teleportation_tag.get_inner_html();
+    Ok(safe_teleportation_tag)
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
