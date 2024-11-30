@@ -891,6 +891,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "fount-rs"
+version = "0.0.1"
+dependencies = [
+ "actix-rt",
+ "once_cell",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "sessionless",
+]
+
+[[package]]
 name = "futf"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1881,11 +1893,14 @@ dependencies = [
 name = "lightningsky"
 version = "0.1.0"
 dependencies = [
+ "fount-rs",
  "safe_teleportation_parser",
  "serde",
  "serde_json",
+ "sessionless",
  "tauri",
  "tauri-build",
+ "tauri-plugin-fs",
  "tauri-plugin-shell",
 ]
 
@@ -3820,6 +3835,27 @@ dependencies = [
  "tauri-utils",
  "toml 0.8.2",
  "walkdir",
+]
+
+[[package]]
+name = "tauri-plugin-fs"
+version = "2.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "96ba7d46e86db8c830d143ef90ab5a453328365b0cc834c24edea4267b16aba0"
+dependencies = [
+ "anyhow",
+ "dunce",
+ "glob",
+ "percent-encoding",
+ "schemars",
+ "serde",
+ "serde_json",
+ "serde_repr",
+ "tauri",
+ "tauri-plugin",
+ "thiserror 1.0.69",
+ "url",
+ "uuid",
 ]
 
 [[package]]

@@ -74,6 +74,6 @@ pub fn get_inner_html(teleport_tag: &TeleportTag) -> String {
     if let Some(teleported) = teleport_tag.html.select(&selector).next() {
 	teleported.inner_html()
     } else {
-	"foo".to_string()
+	"".to_string()
     }
 }

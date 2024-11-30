@@ -22,6 +22,11 @@ tauri = { version = "2", features = [] }
 tauri-plugin-shell = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+tauri-plugin-fs = "2"
+sessionless = "0.1.1"
 
 [dependencies.safe_teleportation_parser]
 path = "../../../safe-parsers/rust/safe_teleportation_parser"
+
+[dependencies.fount-rs]
+path = "../../../../../fount/src/client/rust/fount-rs"
