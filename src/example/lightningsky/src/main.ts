@@ -88,7 +88,9 @@ window.addEventListener("DOMContentLoaded", async () => {
   });
 
   const fountUser = await invoke("create_fount_user");
+  const spellbooks = await invoke("get_spellbooks");
 console.log(fountUser);
+console.log('spellbooks', spellbooks);
 
   teleportationSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   teleportationSVG.setAttribute("style", "position: absolute;top:0;left:0;width:100%;height:100%;");

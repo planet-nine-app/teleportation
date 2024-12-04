@@ -18,6 +18,8 @@ pub struct SafeTeleportationTag {
     pub signature: String,
     pub teleporter_pub_key: String,
     pub message: String,
+    pub spell: String,
+    pub amount: String,
     pub html: String,
     pub teleportal_pub_key: String
 }
@@ -49,6 +51,8 @@ impl SafeTeleportationTag {
             signature: teleport_tag.signature,
             teleporter_pub_key: teleport_tag.teleporter_pub_key,
             message: teleport_tag.message,
+            spell: teleport_tag.spell,
+            amount: teleport_tag.amount,
             teleportal_pub_key
         }
     }

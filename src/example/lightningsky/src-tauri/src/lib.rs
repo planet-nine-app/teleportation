@@ -1,8 +1,10 @@
+use serde_json::json;
 use tauri_plugin_fs::FsExt;
 use safe_teleportation_parser::SafeTeleportationTag;
 use sessionless::hex::FromHex;
 use sessionless::{Sessionless, PrivateKey};
 use fount_rs::{Fount};
+use bdo_rs::{BDO, Spellbook};
 
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -41,6 +43,39 @@ dbg!(&user);
     }
 }
 
+#[tauri::command]
+async fn get_spellbooks() -> Result<Vec<Spellbook>, String> {
+    let s = get_sessionless().await;
+    let private_bdo = json!({
+       "bar": "bar"
+    });
+    let hash = "magicsky".to_string();
+    match s {
+        Ok(sessionless) => {
+            let bdo = BDO::new(Some("https://livetest.bdo.allyabase.com/".to_string()), Some(sessionless));
+            // Clone the values we need before the await
+            let uuid = match bdo.create_user(&hash, &private_bdo).await {
+                Ok(user) => user.uuid,
+                Err(_) => return Ok(Vec::new())
+            };
+dbg!("does it get to here?");
+            
+            // Now use the cloned uuid
+            match bdo.get_spellbooks(&uuid, &hash).await {
+                Ok(spellbooks) => {
+dbg!("spellbooks {}", &spellbooks);                    
+                   Ok(spellbooks)
+                }
+                Err(err) => {
+dbg!("err {}", err);
+                    Ok(Vec::new())
+                }
+            }
+        },
+        Err(_) => Ok(Vec::new())
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -53,7 +88,7 @@ pub fn run() {
 
 	    Ok(())
 	 })
-        .invoke_handler(tauri::generate_handler![greet, get_teleported_html, create_fount_user])
+        .invoke_handler(tauri::generate_handler![greet, get_teleported_html, create_fount_user, get_spellbooks])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

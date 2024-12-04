@@ -7,6 +7,8 @@ pub struct TeleportTag {
     pub signature: String,
     pub teleporter_pub_key: String, 
     pub message: String,
+    pub spell: String,
+    pub amount: String,
     pub html: Html
 }
 
@@ -29,17 +31,23 @@ impl TeleportTag {
              let signature = attributes.get("signature").unwrap_or(&empty_string);
              let teleporter_pub_key = attributes.get("pubkey").unwrap_or(&empty_string);
              let message = attributes.get("message").unwrap_or(&empty_string);
+             let spell = attributes.get("spell").unwrap_or(&empty_string);
+             let amount = attributes.get("amount").unwrap_or(&empty_string);
 
              Self {
                  signature: signature.to_string(),
                  teleporter_pub_key: teleporter_pub_key.to_string(),
                  message: message.to_string(),
+                 spell: spell.to_string(),
+                 amount: amount.to_string(),
                  html: document
              }
         } else {
             Self {
                 signature: "".to_string(),
                 message: "".to_string(),
+                spell: "".to_string(),
+                amount: "".to_string(),
                 teleporter_pub_key: "".to_string(),
                 html: document
             }
