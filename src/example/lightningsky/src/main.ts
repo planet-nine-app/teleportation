@@ -1,6 +1,8 @@
 import { invoke } from "@tauri-apps/api/core";
 import { BskyAgent } from "@atproto/api";
 import config from "./config.json";
+import { create, mkdir, readTextFile, writeTextFile, BaseDirectory } from '@tauri-apps/plugin-fs';
+//import * as fs from "@tauri-apps/plugin-fs";
 
 const LINK_TYPE = "app.bsky.richtext.facet#link";
 let logger: HTMLElement | null;
@@ -48,9 +50,13 @@ logger.textContent += '<br>Should set a uri<br>';
 console.log('teleportTag', teleportTag);
 	if(teleportTag.html.length > 5) {
 	  postHTML += teleportTag.html;
-          postDiv.setAttribute("style", "position: relative;");
+          postDiv.setAttribute("style", "position: relative; cursor: pointer;");
           postDiv.innerHTML = postHTML;
           postDiv.appendChild(teleportationSVG);
+	  teleportationSVG.addEventListener('click', async () => {
+console.log('clicked!');
+	    await invoke('cast_spell', {spell: teleportTag.spell, total_cost: +teleportTag.amount, mp: !!teleportTag.mp});
+	  });
 	} else {
           postDiv.innerHTML = postHTML;
         }
@@ -87,7 +93,28 @@ window.addEventListener("DOMContentLoaded", async () => {
     getFeed();
   });
 
-  const fountUser = await invoke("create_fount_user");
+  let fountUser;
+  try {
+  const fountUserString = await readTextFile('fount/user.json', {
+    baseDir: BaseDirectory.AppLocalData,
+  });
+console.log('contents', fountUserString);
+  fountUser = JSON.parse(fountUserString);
+  } catch(err) {
+console.log('problem', err);
+    try {
+      fountUser = await invoke("create_fount_user");
+      await mkdir('', {baseDir: BaseDirectory.AppLocalData});
+      await mkdir('fount', {baseDir: BaseDirectory.AppLocalData});
+  //    await create('fount/user', { baseDir: BaseDirectory.AppLocalData })
+      await writeTextFile('fount/user.json', JSON.stringify(fountUser), {
+	baseDir: BaseDirectory.AppLocalData,
+      });
+    } catch(err) {
+  console.warn(err);
+    }
+  }
+
   const spellbooks = await invoke("get_spellbooks");
 console.log(fountUser);
 console.log('spellbooks', spellbooks);

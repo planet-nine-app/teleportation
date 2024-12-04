@@ -3,7 +3,7 @@ use tauri_plugin_fs::FsExt;
 use safe_teleportation_parser::SafeTeleportationTag;
 use sessionless::hex::FromHex;
 use sessionless::{Sessionless, PrivateKey};
-use fount_rs::{Fount};
+use fount_rs::{Fount, FountUser};
 use bdo_rs::{BDO, Spellbook};
 
 #[tauri::command]
@@ -27,19 +27,19 @@ async fn get_sessionless() -> Result<Sessionless, String> {
 } 
 
 #[tauri::command]
-async fn create_fount_user() -> Result<bool, String> {
+async fn create_fount_user() -> Result<FountUser, String> {
     let s = get_sessionless().await;
     match s {
         Ok(sessionless) => {
             let fount = Fount::new(Some("https://livetest.fount.allyabase.com/".to_string()), Some(sessionless));
-            let user = fount.create_user().await;
-dbg!(&user);
-            return match user {
-                Ok(_) => Ok(true),
-                Err(_) => Ok(false)
+            let _user = fount.create_user().await;
+dbg!(&_user);
+            return match _user {
+                Ok(user) => Ok(user),
+                Err(_) => Err("no user".to_string())
             }
         },
-        Err(_) => Ok(false)
+        Err(_) => Err("no user".to_string())
     }
 }
 
@@ -76,19 +76,17 @@ dbg!("err {}", err);
     }
 }
 
+#[tauri::command(rename_all = "snake_case")]
+async fn cast_spell(spell: String, total_cost: u32, mp: bool) {
+dbg!("{}, {}, {}", spell, total_cost, mp);
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
-        .setup(|app| {
-	    let scope = app.fs_scope();
-	    scope.allow_directory("./", false);
-	    dbg!(scope.allowed());
-
-	    Ok(())
-	 })
-        .invoke_handler(tauri::generate_handler![greet, get_teleported_html, create_fount_user, get_spellbooks])
+        .invoke_handler(tauri::generate_handler![greet, get_teleported_html, create_fount_user, get_spellbooks, cast_spell])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
