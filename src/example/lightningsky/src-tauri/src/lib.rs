@@ -1,7 +1,11 @@
+use reqwest::{Client, Response};
+use std::time::{SystemTime, UNIX_EPOCH};
 use serde_json::json;
+use serde_json::Value;
 use tauri_plugin_fs::FsExt;
 use safe_teleportation_parser::SafeTeleportationTag;
 use sessionless::hex::FromHex;
+use sessionless::hex::IntoHex;
 use sessionless::{Sessionless, PrivateKey};
 use fount_rs::{Fount, FountUser};
 use bdo_rs::{BDO, Spellbook};
@@ -77,8 +81,41 @@ dbg!("err {}", err);
 }
 
 #[tauri::command(rename_all = "snake_case")]
-async fn cast_spell(spell: String, total_cost: u32, mp: bool) {
-dbg!("{}, {}, {}", spell, total_cost, mp);
+async fn cast_spell(spell: String, total_cost: u32, mp: bool, fount_user: FountUser, destination: String) {
+dbg!("{}, {}, {}, {}, {}", &spell, total_cost, mp, &fount_user, &destination);
+    let sessionless = match get_sessionless().await {
+        Ok(s) => s,
+        Err(_) => return
+    };
+
+    let timestamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("Time went backwards")
+            .as_millis()
+            .to_string();
+
+    let message = format!("{}{}{}{}{}{}", timestamp, spell, fount_user.uuid, total_cost, mp, fount_user.ordinal + 1);
+    let signature = sessionless.sign(message).to_hex();
+
+    let spell_payload = json!({
+       "timestamp": timestamp,
+       "spell": spell,
+       "casterUUID": fount_user.uuid,
+       "totalCost": total_cost,
+       "mp": mp,
+       "ordinal": fount_user.ordinal + 1,
+       "casterSignature": signature,
+       "gateways": Vec::<Value>::new()
+    });
+
+    let client = Client::new();
+
+    let res = client
+            .post(destination)
+            .json(&spell_payload)
+            .send()
+            .await;
+dbg!("{}", res);
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

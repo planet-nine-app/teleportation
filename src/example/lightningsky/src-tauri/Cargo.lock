@@ -1907,6 +1907,7 @@ version = "0.1.0"
 dependencies = [
  "bdo-rs",
  "fount-rs",
+ "reqwest",
  "safe_teleportation_parser",
  "serde",
  "serde_json",

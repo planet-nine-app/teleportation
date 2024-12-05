@@ -7,6 +7,8 @@ import { create, mkdir, readTextFile, writeTextFile, BaseDirectory } from '@taur
 const LINK_TYPE = "app.bsky.richtext.facet#link";
 let logger: HTMLElement | null;
 let teleportationSVG;
+let fountUser;
+let spellbooks;
 
 const getFeed = async () => {
 logger.textContent = 'getting here at least';
@@ -53,10 +55,20 @@ console.log('teleportTag', teleportTag);
           postDiv.setAttribute("style", "position: relative; cursor: pointer;");
           postDiv.innerHTML = postHTML;
           postDiv.appendChild(teleportationSVG);
+          const feed = document.getElementById("feed");
+          const scrollOverlay = document.getElementById("scrollOverlay");
+          feed.removeChild(scrollOverlay);
+          postDiv.appendChild(scrollOverlay);
 	  teleportationSVG.addEventListener('click', async () => {
 console.log('clicked!');
-	    await invoke('cast_spell', {spell: teleportTag.spell, total_cost: +teleportTag.amount, mp: !!teleportTag.mp});
+            window.showSpellAlert();
+	    //await invoke('cast_spell', {spell: teleportTag.spell, total_cost: +teleportTag.amount, mp: !!teleportTag.mp});
 	  });
+          window.accept = async () => {
+            console.log('Elven magic cast!');
+            await invoke('cast_spell', {spell: teleportTag.spell, total_cost: +teleportTag.amount, mp: true /*!!teleportTag.mp*/, fount_user: fountUser, destination: spellbooks[0][teleportTag.spell].destinations[0].stopURL});
+            hideSpellAlert();
+          };
 	} else {
           postDiv.innerHTML = postHTML;
         }
@@ -87,13 +99,30 @@ logger.textContent = err;
 };
 
 window.addEventListener("DOMContentLoaded", async () => {
+
+  window.showSpellAlert = () => {
+    const overlay = document.getElementById('scrollOverlay');
+    console.log('Before:', overlay.style.display);
+    overlay.style.display = 'flex';
+    console.log('After:', overlay.style.display);
+  };
+
+  window.hideSpellAlert = () => {
+    document.getElementById('scrollOverlay').style.display = 'none';
+  };
+
+  document.getElementById('scrollOverlay').addEventListener('click', function(e) {
+    if (e.target === this) {
+	hideSpellAlert();
+    }
+  });
+
   logger = document.querySelector("#logger");
   document.querySelector("#get-feed")?.addEventListener("click", (e) => {
     e.preventDefault();
     getFeed();
   });
 
-  let fountUser;
   try {
   const fountUserString = await readTextFile('fount/user.json', {
     baseDir: BaseDirectory.AppLocalData,
@@ -115,7 +144,7 @@ console.log('problem', err);
     }
   }
 
-  const spellbooks = await invoke("get_spellbooks");
+  spellbooks = await invoke("get_spellbooks");
 console.log(fountUser);
 console.log('spellbooks', spellbooks);
 
@@ -222,4 +251,5 @@ console.log('spellbooks', spellbooks);
   /* getTimeline    const feed = await agent.getTimeline({
 	limit: 5
       });*/
+
 
