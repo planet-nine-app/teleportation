@@ -2,9 +2,9 @@ import { invoke } from "@tauri-apps/api/core";
 let stripe;
 let elements;
 
-window.getPaymentIntentWithoutSplits = async (addieUser, amount, currency) => {
+window.getPaymentIntentWithoutSplits = async (amount, currency) => {
   try {
-    const response = await invoke("get_payment_intent_without_splits", {addieUser, amount, currency});
+    const response = await invoke("get_payment_intent_without_splits", {amount, currency});
     
     stripe = Stripe(response.publishableKey);
     elements = stripe.elements({

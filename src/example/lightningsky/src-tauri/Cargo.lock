@@ -24,6 +24,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "addie-rs"
+version = "0.1.0"
+dependencies = [
+ "actix-rt",
+ "once_cell",
+ "rand 0.7.3",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "sessionless",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.24.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1905,6 +1918,7 @@ dependencies = [
 name = "lightningsky"
 version = "0.1.0"
 dependencies = [
+ "addie-rs",
  "bdo-rs",
  "fount-rs",
  "reqwest",

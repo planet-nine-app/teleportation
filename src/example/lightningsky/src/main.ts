@@ -51,6 +51,9 @@ logger.textContent += '<br>Should set a uri<br>';
 	});    
 console.log('teleportTag', teleportTag);
 	if(teleportTag.html.length > 5) {
+          window.getPaymentIntentWithoutSplits(+teleportTag.amount, 'USD')
+            .then(() => console.log('should have intent'))
+            .catch(console.warn);
 	  postHTML += teleportTag.html;
           postDiv.setAttribute("style", "position: relative; cursor: pointer;");
           postDiv.innerHTML = postHTML;
@@ -66,7 +69,8 @@ console.log('clicked!');
 	  });
           window.accept = async () => {
             console.log('Elven magic cast!');
-            await invoke('cast_spell', {spell: teleportTag.spell, total_cost: +teleportTag.amount, mp: true /*!!teleportTag.mp*/, fount_user: fountUser, destination: spellbooks[0][teleportTag.spell].destinations[0].stopURL});
+//            await invoke('cast_spell', {spell: teleportTag.spell, total_cost: +teleportTag.amount, mp: true /*!!teleportTag.mp*/, fount_user: fountUser, destination: spellbooks[0][teleportTag.spell].destinations[0].stopURL});
+            document.getElementById("payment-form").setAttribute("style", "display: visible;");
             hideSpellAlert();
           };
 	} else {

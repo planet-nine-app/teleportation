@@ -9,6 +9,8 @@ use sessionless::hex::IntoHex;
 use sessionless::{Sessionless, PrivateKey};
 use fount_rs::{Fount, FountUser};
 use bdo_rs::{BDO, Spellbook};
+use addie_rs::{Addie};
+use addie_rs::structs::{AddieUser, PaymentIntent};
 
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -44,6 +46,28 @@ dbg!(&_user);
             }
         },
         Err(_) => Err("no user".to_string())
+    }
+}
+
+#[tauri::command]
+async fn get_payment_intent_without_splits(amount: &u32, currency: &str) -> Result<PaymentIntent, String> {
+    let s = get_sessionless().await;
+    let stripe = "stripe";
+
+    match s {
+        Ok(sessionless) => {
+            let addie = Addie::new(Some("https://livetest.addie.allyabase.com/".to_string()), Some(sessionless));
+            let addie_user = match addie.create_user().await {
+                Ok(user) => user,
+                Err(_) => return Ok(PaymentIntent::new())
+            };
+
+            match addie.get_payment_intent_without_splits(&addie_user.uuid, &stripe, &amount, &currency).await {
+                Ok(intent) => Ok(intent),
+                Err(_) => return Ok(PaymentIntent::new())
+            }
+        },
+        Err(_) => Ok(PaymentIntent::new())
     }
 }
 
