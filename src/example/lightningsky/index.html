@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script src="https://js.stripe.com/v3/"></script>
     <style>
 
 /*elven magic-style */
@@ -187,15 +188,76 @@
         .alert-button:first-child {
             border-right: 1px solid rgba(0, 0, 0, 0.1);
         }
+
+
+    /* stripe form styling */
+        .payment-form {
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        #payment-element {
+            margin-bottom: 24px;
+        }
+        
+        #submit-button {
+            background: #5469d4;
+            color: #ffffff;
+            border-radius: 4px;
+            border: 0;
+            padding: 12px 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+        
+        #submit-button:hover {
+            filter: brightness(90%);
+        }
+        
+        #submit-button:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+        
+        .error-message {
+            color: #df1b41;
+            padding: 12px;
+            margin: 4px 0;
+            background: #ffefef;
+            border-radius: 4px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 12px 0;
+        }
+
     </style>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="/src/styles.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tauri App</title>
     <script type="module" src="/src/main.ts" defer></script>
+    <script type="module" src="/src/stripe.ts" defer></script>
   </head>
 
   <body>
+    <form id="payment-form" class="payment-form">
+        <div id="payment-element">
+            <!-- Stripe Elements will be inserted here -->
+        </div>
+        <button id="submit-button">Pay now</button>
+        <div id="error-message" class="error-message" style="display: none;"></div>
+        <div id="loading" class="loading">Processing payment...</div>
+    </form>
     <main class="container">
       <h1>Welcome to LightningSky</h1>
       <div id="feed" class="container">
