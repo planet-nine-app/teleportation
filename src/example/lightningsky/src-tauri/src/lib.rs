@@ -1,8 +1,7 @@
-use reqwest::{Client, Response};
+use reqwest::Client;
 use std::time::{SystemTime, UNIX_EPOCH};
 use serde_json::json;
 use serde_json::Value;
-use tauri_plugin_fs::FsExt;
 use safe_teleportation_parser::SafeTeleportationTag;
 use sessionless::hex::FromHex;
 use sessionless::hex::IntoHex;
@@ -10,7 +9,7 @@ use sessionless::{Sessionless, PrivateKey};
 use fount_rs::{Fount, FountUser};
 use bdo_rs::{BDO, Spellbook};
 use addie_rs::{Addie};
-use addie_rs::structs::{AddieUser, PaymentIntent};
+use addie_rs::structs::PaymentIntent;
 
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -49,8 +48,8 @@ dbg!(&_user);
     }
 }
 
-#[tauri::command]
-async fn get_payment_intent_without_splits(amount: &u32, currency: &str) -> Result<PaymentIntent, String> {
+#[tauri::command(rename_all = "snake_case")]
+async fn get_payment_intent_without_splits(amount: u32, currency: &str) -> Result<PaymentIntent, String> {
     let s = get_sessionless().await;
     let stripe = "stripe";
 
@@ -59,12 +58,18 @@ async fn get_payment_intent_without_splits(amount: &u32, currency: &str) -> Resu
             let addie = Addie::new(Some("https://livetest.addie.allyabase.com/".to_string()), Some(sessionless));
             let addie_user = match addie.create_user().await {
                 Ok(user) => user,
-                Err(_) => return Ok(PaymentIntent::new())
+                Err(_) => {
+                    dbg!("The problem is getting the user");
+                    return Ok(PaymentIntent::new())
+                }
             };
 
             match addie.get_payment_intent_without_splits(&addie_user.uuid, &stripe, &amount, &currency).await {
                 Ok(intent) => Ok(intent),
-                Err(_) => return Ok(PaymentIntent::new())
+                Err(err) => {
+                    dbg!("the intent failed for some reason {}", err);
+                    return Ok(PaymentIntent::new())
+                }
             }
         },
         Err(_) => Ok(PaymentIntent::new())
@@ -147,7 +152,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![greet, get_teleported_html, create_fount_user, get_spellbooks, cast_spell])
+        .invoke_handler(tauri::generate_handler![greet, get_teleported_html, create_fount_user, get_spellbooks, cast_spell, get_payment_intent_without_splits])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

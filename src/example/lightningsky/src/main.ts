@@ -33,15 +33,17 @@ logger.textContent = 'getting here at least';
 	<p>${item.post.record.text}</p>
       `;
 
-      item.post.record.facets.forEach(facet => {
-//logger.textContent += '\n' + JSON.stringify(facet) + '\n';
-        facet.features && facet.features.forEach(feature => {
-	  if(feature.$type === LINK_TYPE) {
-logger.textContent += '<br>Should set a uri<br>';
-	    teleportedURI = feature.uri;
-	  }
-        });
-      });
+      if(item && item.post && item.post.record && item.post.record.facets) {
+	item.post.record.facets.forEach(facet => {
+  //logger.textContent += '\n' + JSON.stringify(facet) + '\n';
+	  facet.features && facet.features.forEach(feature => {
+	    if(feature.$type === LINK_TYPE) {
+  logger.textContent += '<br>Should set a uri<br>';
+	      teleportedURI = feature.uri;
+	    }
+	  });
+	});
+      }
 
       const postDiv = document.createElement('div');
 
