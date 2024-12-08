@@ -8,9 +8,68 @@ const LINK_TYPE = "app.bsky.richtext.facet#link";
 let logger: HTMLElement | null;
 let teleportationSVG;
 let fountUser;
-let spellbooks;
+let spellbooks = [{"spellbookName":"livetest","aBriefHistoryOfTeleportation":{"cost":2000,"destinations":[{"stopName":"product page","stopURL":"https://livetest.julia.allyabase.com/magic/spell/aBriefHistoryOfTeleportation"},{"stopName":"fount","stopURL":"https://livetest.fount.allyabase.com/resolve/aBriefHistoryOfTeleportation"}]}}];
+
+  try {
+  const fountUserString = await readTextFile('fount/user.json', {
+    baseDir: BaseDirectory.AppLocalData,
+  });
+console.log('contents', fountUserString);
+  fountUser = JSON.parse(fountUserString);
+  } catch(err) {
+console.log('problem', err);
+    try {
+      fountUser = await invoke("create_fount_user");
+      await mkdir('', {baseDir: BaseDirectory.AppLocalData});
+      await mkdir('fount', {baseDir: BaseDirectory.AppLocalData});
+  //    await create('fount/user', { baseDir: BaseDirectory.AppLocalData })
+      await writeTextFile('fount/user.json', JSON.stringify(fountUser), {
+	baseDir: BaseDirectory.AppLocalData,
+      });
+    } catch(err) {
+  console.warn(err);
+    }
+  }
+
+console.log('HERE /iS WINDOW LOCATION', window.location.origin);
+console.log(window.location.search);
+let query = {};
+if(window.location.search) {
+  const sliceQ = window.location.search.slice(1, window.location.search.length);
+  const searches = sliceQ.split("&");
+  const paramTuples = searches.map(search => search.split("="));
+  paramTuples.forEach(tuple => query[tuple[0]] = tuple[1]);
+};
+console.log('query', query);
+
+window.purchases = window.purchases || {foo: {}};
+query.teleportTag = JSON.stringify({
+  amount: "2000",
+  spell: "aBriefHistoryOfTeleportation",
+  mp: false
+});
+query.foo = 'bar';
+console.log(query.teleportTag);
+if(query.teleportTag && !window.purchases.foo[query.foo]) {
+console.log('in the if');
+  window.purchases.foo[query.foo] = true;
+  window.teleportTag = JSON.parse(query.teleportTag);
+  if(!window.teleportTag) {
+    console.log('no tag saved');
+  } else {
+console.log('about to cast spell');
+    const teleportTag = window.teleportTag;
+    try {
+//      const success = await invoke('cast_spell', {spell: teleportTag.spell, total_cost: +teleportTag.amount, mp: !!teleportTag.mp, fount_user: fountUser, destination: spellbooks[0][teleportTag.spell].destinations[0].stopURL});
+  //    console.log(success);
+    } catch(err) {
+console.warn(err);
+    }
+  }
+} 
 
 const getFeed = async () => {
+console.log('getFeed called');
 logger.textContent = 'getting here at least';
   try {
     const agent = new BskyAgent({
@@ -20,12 +79,24 @@ logger.textContent = 'getting here at least';
       identifier: config.email,
       password: config.password
     });
+    const notifications = await agent.listNotifications({limit: 10})
+console.log('notifications', notifications);
+console.log('data.notifications', notifications.data.notifications);
+    const postURIs = notifications.data.notifications.filter(notification => notification.uri.indexOf('post') !== -1).map($ => $.uri);
+    const osfPosts = await agent.getPosts({uris: postURIs});
+console.log('osfPosts', osfPosts);
     const feed = await agent.getAuthorFeed({
       actor: agent.did,
       limit: 5
     });
+    feed.data.feed = [...new Set([...feed.data.feed, ...osfPosts.data.posts])];
     feed.data.feed.forEach(async item => {
       let teleportedURI;
+      if(!item.post) {
+        item = {post: item};
+      }
+console.log(item);
+console.log(item.post);
 
       let postHTML = `
 	<h3>${item.post.author.displayName}</h3>
@@ -34,6 +105,7 @@ logger.textContent = 'getting here at least';
       `;
 
       if(item && item.post && item.post.record && item.post.record.facets) {
+console.log(item.post.record.facets);
 	item.post.record.facets.forEach(facet => {
   //logger.textContent += '\n' + JSON.stringify(facet) + '\n';
 	  facet.features && facet.features.forEach(feature => {
@@ -59,12 +131,20 @@ console.log('teleportTag', teleportTag);
 	  postHTML += teleportTag.html;
           postDiv.setAttribute("style", "position: relative; cursor: pointer;");
           postDiv.innerHTML = postHTML;
-          postDiv.appendChild(teleportationSVG);
+          const svgClone = teleportationSVG.cloneNode(true);
+          postDiv.appendChild(svgClone);
+          const scrollAlert = document.getElementById("scroll-alert-message");
+          scrollAlert.innerHTML = `Forsooth and forswain, for ${item.post.author.displayName} has connected a teleportal for to cast ${teleportTag.spell} for ${(teleportTag.amount / 100).toFixed(2)} ${teleportTag.mp ? 'MP' : 'dollars'}.`; 
           const feed = document.getElementById("feed");
           const scrollOverlay = document.getElementById("scrollOverlay");
-          feed.removeChild(scrollOverlay);
-          postDiv.appendChild(scrollOverlay);
-	  teleportationSVG.addEventListener('click', async () => {
+          const clone = scrollOverlay.cloneNode(true);
+          try {
+            feed.removeChild(scrollOverlay);
+          } catch(err) {
+
+          }
+          postDiv.appendChild(clone);
+	  svgClone.addEventListener('click', async () => {
 console.log('clicked!');
             window.showSpellAlert();
 	    //await invoke('cast_spell', {spell: teleportTag.spell, total_cost: +teleportTag.amount, mp: !!teleportTag.mp});
@@ -73,6 +153,7 @@ console.log('clicked!');
             console.log('Elven magic cast!');
 //            await invoke('cast_spell', {spell: teleportTag.spell, total_cost: +teleportTag.amount, mp: true /*!!teleportTag.mp*/, fount_user: fountUser, destination: spellbooks[0][teleportTag.spell].destinations[0].stopURL});
             document.getElementById("payment-form").setAttribute("style", "display: visible;");
+            window.teleportTag = teleportTag;
             hideSpellAlert();
           };
 	} else {
@@ -104,7 +185,10 @@ logger.textContent = err;
   }
 };
 
-window.addEventListener("DOMContentLoaded", async () => {
+console.log('about to add event listener');
+
+const init = async () => {
+  console.log('DOMContent has been loaded');
 
   window.showSpellAlert = () => {
     const overlay = document.getElementById('scrollOverlay');
@@ -125,32 +209,12 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   logger = document.querySelector("#logger");
   document.querySelector("#get-feed")?.addEventListener("click", (e) => {
+console.log('clicked get feed');
     e.preventDefault();
     getFeed();
   });
 
-  try {
-  const fountUserString = await readTextFile('fount/user.json', {
-    baseDir: BaseDirectory.AppLocalData,
-  });
-console.log('contents', fountUserString);
-  fountUser = JSON.parse(fountUserString);
-  } catch(err) {
-console.log('problem', err);
-    try {
-      fountUser = await invoke("create_fount_user");
-      await mkdir('', {baseDir: BaseDirectory.AppLocalData});
-      await mkdir('fount', {baseDir: BaseDirectory.AppLocalData});
-  //    await create('fount/user', { baseDir: BaseDirectory.AppLocalData })
-      await writeTextFile('fount/user.json', JSON.stringify(fountUser), {
-	baseDir: BaseDirectory.AppLocalData,
-      });
-    } catch(err) {
-  console.warn(err);
-    }
-  }
-
-  spellbooks = await invoke("get_spellbooks");
+  //spellbooks = await invoke("get_spellbooks");
 console.log(fountUser);
 console.log('spellbooks', spellbooks);
 
@@ -247,7 +311,15 @@ console.log('spellbooks', spellbooks);
     </g>
   </svg>`;
 
-});
+};
+
+if(document.readyState !== 'loading') {
+  await init();
+} else {
+  window.addEventListener("DOMContentLoaded", init);
+}
+
+console.log('after event listener');
 
   /* posting    await agent.post({
 	text: "Once this works, all bets are off. #planetnineisablueskydevnow",

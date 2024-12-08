@@ -1,3 +1,4 @@
+use std::env;
 use reqwest::Client;
 use std::time::{SystemTime, UNIX_EPOCH};
 use serde_json::json;
@@ -27,7 +28,8 @@ async fn get_teleported_html(url: String) -> Result<SafeTeleportationTag, String
 }
 
 async fn get_sessionless() -> Result<Sessionless, String> {
-    let sessionless = Sessionless::from_private_key(PrivateKey::from_hex("b75011b167c5e3a6b0de97d8e1950cd9548f83bb67f47112bed6a082db795496").expect("private key"));
+    let private_key = env::var("PRIVATE_KEY").unwrap_or_else(|_| String::from("b75011b167c5e3a6b0de97d8e1950cd9548f83bb67f47112bed6a082db795496"));
+    let sessionless = Sessionless::from_private_key(PrivateKey::from_hex(private_key).expect("private key"));
     Ok(sessionless)    
 } 
 
@@ -110,7 +112,7 @@ dbg!("err {}", err);
 }
 
 #[tauri::command(rename_all = "snake_case")]
-async fn cast_spell(spell: String, total_cost: u32, mp: bool, fount_user: FountUser, destination: String) {
+async fn cast_spell(spell: String, total_cost: u32, mp: bool, fount_user: FountUser, destination: String, gateway_users: Vec<String>) {
 dbg!("{}, {}, {}, {}, {}", &spell, total_cost, mp, &fount_user, &destination);
     let sessionless = match get_sessionless().await {
         Ok(s) => s,
@@ -124,7 +126,15 @@ dbg!("{}, {}, {}, {}, {}", &spell, total_cost, mp, &fount_user, &destination);
             .to_string();
 
     let message = format!("{}{}{}{}{}{}", timestamp, spell, fount_user.uuid, total_cost, mp, fount_user.ordinal + 1);
+dbg!("{}", &message);
     let signature = sessionless.sign(message).to_hex();
+
+    let gateways: Vec<Gateway> = pub_keys.into_iter()
+    .map(|pub_key| Gateway {
+        pub_key,
+        ..Gateway::default()
+    })
+    .collect();
 
     let spell_payload = json!({
        "timestamp": timestamp,
@@ -134,7 +144,7 @@ dbg!("{}, {}, {}, {}, {}", &spell, total_cost, mp, &fount_user, &destination);
        "mp": mp,
        "ordinal": fount_user.ordinal + 1,
        "casterSignature": signature,
-       "gateways": Vec::<Value>::new()
+       "gateways": gateways
     });
 
     let client = Client::new();
@@ -144,7 +154,7 @@ dbg!("{}, {}, {}, {}, {}", &spell, total_cost, mp, &fount_user, &destination);
             .json(&spell_payload)
             .send()
             .await;
-dbg!("{}", res);
+
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

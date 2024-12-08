@@ -4,6 +4,7 @@ let elements;
 let response;
 
 window.getPaymentIntentWithoutSplits = async (amount, currency) => {
+return;
   try {
     response = await invoke("get_payment_intent_without_splits", {amount, currency});
 console.log('response is', response);
@@ -25,6 +26,28 @@ const submitButton = document.getElementById('submit-button');
 const errorMessage = document.getElementById('error-message');
 const loadingMessage = document.getElementById('loading');
 
+
+window.updateConfirmPayment = (tag, referrer = "") => {
+  window.confirmPayment = async () => {
+    try {
+      const { error } = await stripe.confirmPayment({
+	  elements,
+	  confirmParams: {
+	      return_url: `${window.location.origin}?foo=bar&teleportTag=${JSON.stringify(window.teleportTag)}`,
+	  },
+      });
+
+      if(error) {
+	showError(error.message);
+      }
+    } catch(err) {
+      showError('An unexpected error occurred.');
+  console.warn('Payment error:', error);
+    }
+  };
+};
+
+
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
 
@@ -35,21 +58,7 @@ form.addEventListener('submit', async (event) => {
   // Disable form submission while processing
   setLoading(true);
 
-  try {
-    const { error } = await stripe.confirmPayment({
-	elements,
-	confirmParams: {
-	    return_url: `${window.location.origin}?foo=bar`,
-	},
-    });
-
-    if(error) {
-      showError(error.message);
-    }
-  } catch(err) {
-    showError('An unexpected error occurred.');
-console.warn('Payment error:', error);
-  }
+  await confirmPayment();
 
   setLoading(false);
 });

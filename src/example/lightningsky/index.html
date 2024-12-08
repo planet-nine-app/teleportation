@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <script src="https://js.stripe.com/v3/"></script>
+    <!--script src="https://js.stripe.com/v3/"></script-->
     <style>
 
 /*elven magic-style */
@@ -74,7 +74,7 @@
 
         .scroll-alert-message {
             font-size: 16px;
-            color: #4d3900;
+            color: #000000;
             margin: 0 0 20px;
             line-height: 1.5;
             font-style: italic;
@@ -259,7 +259,7 @@
         <div id="loading" class="loading">Processing payment...</div>
     </form>
     <main class="container">
-      <h1>Welcome to LightningSky</h1>
+      <h1>Welcome to Magicsky</h1>
       <div id="feed" class="container">
        <div class="scroll-alert-overlay" id="scrollOverlay">
         <div class="scroll-alert">
@@ -282,8 +282,8 @@
             </svg>
             
             <div class="scroll-alert-content">
-                <div class="scroll-alert-title">Ancient Elven Scroll</div>
-                <p class="scroll-alert-message">By the light of the ancient woods, do you seek to invoke this elven magic? Such powers are bound to the eternal cycles of nature.</p>
+                <div class="scroll-alert-title">livetest</div>
+                <p class="scroll-alert-message" id="scroll-alert-message"></p>
                 <div class="scroll-alert-buttons">
                     <button class="scroll-alert-button" onclick="hideSpellAlert()">Decline</button>
                     <button class="scroll-alert-button" onclick="accept()" id="acceptButton">Accept</button>
