@@ -4,7 +4,6 @@ let elements;
 let response;
 
 window.getPaymentIntentWithoutSplits = async (amount, currency) => {
-return;
   try {
     response = await invoke("get_payment_intent_without_splits", {amount, currency});
 console.log('response is', response);
@@ -29,11 +28,14 @@ const loadingMessage = document.getElementById('loading');
 
 window.updateConfirmPayment = (tag, referrer = "") => {
   window.confirmPayment = async () => {
+  const redirect = `${window.location.origin}?foo=bar&spell=${tag.spell}&amount=${tag.amount}&mp=${tag.mp || 'false'}&referrer=${referrer}`;
+  window.location.href = redirect;
+  return;
     try {
       const { error } = await stripe.confirmPayment({
 	  elements,
 	  confirmParams: {
-	      return_url: `${window.location.origin}?foo=bar&teleportTag=${JSON.stringify(window.teleportTag)}`,
+	      return_url: redirect,
 	  },
       });
 
@@ -58,7 +60,7 @@ form.addEventListener('submit', async (event) => {
   // Disable form submission while processing
   setLoading(true);
 
-  await confirmPayment();
+  await window.confirmPayment();
 
   setLoading(false);
 });

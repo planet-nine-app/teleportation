@@ -39,34 +39,39 @@ if(window.location.search) {
   const searches = sliceQ.split("&");
   const paramTuples = searches.map(search => search.split("="));
   paramTuples.forEach(tuple => query[tuple[0]] = tuple[1]);
-};
-console.log('query', query);
 
-window.purchases = window.purchases || {foo: {}};
-query.teleportTag = JSON.stringify({
-  amount: "2000",
-  spell: "aBriefHistoryOfTeleportation",
-  mp: false
-});
-query.foo = 'bar';
-console.log(query.teleportTag);
-if(query.teleportTag && !window.purchases.foo[query.foo]) {
-console.log('in the if');
-  window.purchases.foo[query.foo] = true;
-  window.teleportTag = JSON.parse(query.teleportTag);
-  if(!window.teleportTag) {
-    console.log('no tag saved');
-  } else {
-console.log('about to cast spell');
-    const teleportTag = window.teleportTag;
-    try {
-//      const success = await invoke('cast_spell', {spell: teleportTag.spell, total_cost: +teleportTag.amount, mp: !!teleportTag.mp, fount_user: fountUser, destination: spellbooks[0][teleportTag.spell].destinations[0].stopURL});
-  //    console.log(success);
-    } catch(err) {
-console.warn(err);
+  console.log('query', query);
+
+  window.purchases = window.purchases || {foo: {}};
+  query.teleportTag = JSON.stringify({
+    amount: query.amount,
+    spell: query.spell,
+    mp: query.mp !== 'false'
+  });
+  query.foo = 'bar';
+console.log('condition', query.teleportTag && !window.purchases.foo[query.foo]);
+  if(query.teleportTag && !window.purchases.foo[query.foo]) {
+  console.log('in the if');
+    window.purchases.foo[query.foo] = true;
+    window.teleportTag = JSON.parse(query.teleportTag);
+    if(!window.teleportTag) {
+      console.log('no tag saved');
+    } else {
+  console.log('about to cast spell');
+      const teleportTag = window.teleportTag;
+      try {
+	const spell = {spell: teleportTag.spell, total_cost: +teleportTag.amount, mp: !!teleportTag.mp, fount_user: fountUser, destination: spellbooks[0][teleportTag.spell].destinations[0].stopURL, gateway_users: [query.referrer]};
+	console.log(spell);
+        const success = await invoke('cast_spell', spell);
+        console.log('spell success', success);
+  //      const success = await invoke('cast_spell', {spell: teleportTag.spell, total_cost: +teleportTag.amount, mp: !!teleportTag.mp, fount_user: fountUser, destination: spellbooks[0][teleportTag.spell].destinations[0].stopURL});
+    //    console.log(success);
+      } catch(err) {
+  console.warn(err);
+      }
     }
-  }
-} 
+  } 
+}
 
 const getFeed = async () => {
 console.log('getFeed called');
@@ -125,9 +130,8 @@ console.log(item.post.record.facets);
 	});    
 console.log('teleportTag', teleportTag);
 	if(teleportTag.html.length > 5) {
-          window.getPaymentIntentWithoutSplits(+teleportTag.amount, 'USD')
-            .then(() => console.log('should have intent'))
-            .catch(console.warn);
+          const split = teleportedURI.split('?');
+          const referrer = split.length > 1 ? split[1].split('=')[1] : '';
 	  postHTML += teleportTag.html;
           postDiv.setAttribute("style", "position: relative; cursor: pointer;");
           postDiv.innerHTML = postHTML;
@@ -150,10 +154,15 @@ console.log('clicked!');
 	    //await invoke('cast_spell', {spell: teleportTag.spell, total_cost: +teleportTag.amount, mp: !!teleportTag.mp});
 	  });
           window.accept = async () => {
+/*            window.getPaymentIntentWithoutSplits(+teleportTag.amount, 'USD')
+              .then(() => console.log('should have intent'))
+              .catch(console.warn);*/
             console.log('Elven magic cast!');
 //            await invoke('cast_spell', {spell: teleportTag.spell, total_cost: +teleportTag.amount, mp: true /*!!teleportTag.mp*/, fount_user: fountUser, destination: spellbooks[0][teleportTag.spell].destinations[0].stopURL});
+            window.updateConfirmPayment(teleportTag, referrer);
             document.getElementById("payment-form").setAttribute("style", "display: visible;");
             window.teleportTag = teleportTag;
+            window.confirmPayment();
             hideSpellAlert();
           };
 	} else {

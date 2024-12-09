@@ -8,6 +8,7 @@ use sessionless::hex::FromHex;
 use sessionless::hex::IntoHex;
 use sessionless::{Sessionless, PrivateKey};
 use fount_rs::{Fount, FountUser};
+use fount_rs::structs::{Gateway};
 use bdo_rs::{BDO, Spellbook};
 use addie_rs::{Addie};
 use addie_rs::structs::PaymentIntent;
@@ -129,7 +130,7 @@ dbg!("{}, {}, {}, {}, {}", &spell, total_cost, mp, &fount_user, &destination);
 dbg!("{}", &message);
     let signature = sessionless.sign(message).to_hex();
 
-    let gateways: Vec<Gateway> = pub_keys.into_iter()
+    let gateways: Vec<Gateway> = gateway_users.into_iter()
     .map(|pub_key| Gateway {
         pub_key,
         ..Gateway::default()
@@ -154,7 +155,6 @@ dbg!("{}", &message);
             .json(&spell_payload)
             .send()
             .await;
-
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
