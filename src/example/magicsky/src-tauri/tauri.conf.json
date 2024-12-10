@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "lightningsky",
-  "version": "0.1.0",
-  "identifier": "com.lightningsky.app",
+  "productName": "magicsky",
+  "version": "0.0.1",
+  "identifier": "com.magicsky.app",
   "build": {
     "beforeDevCommand": "yarn dev",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "lightningsky",
+        "title": "magicsky",
         "width": 800,
         "height": 600
       }
