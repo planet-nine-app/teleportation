@@ -1,0 +1,16 @@
+{
+  "name": "teleportation-js",
+  "version": "0.0.3",
+  "description": "Do you want to teleport?",
+  "main": "teleportation.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "planetnineisaspaceship",
+  "license": "MIT",
+  "dependencies": {
+    "jsdom-jscore": "^0.1.0",
+    "sessionless-node": "^0.11.0"
+  }
+}
