@@ -12,10 +12,12 @@ use fount_rs::structs::{Gateway};
 use bdo_rs::{BDO, Spellbook};
 use addie_rs::{Addie};
 use addie_rs::structs::PaymentIntent;
+use sanora_rs::{Sanora};
+use sanora_rs::structs::ProductMeta;
 
 #[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+fn dbg(log: &str) {
+    dbg!(log);
 }
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
@@ -113,6 +115,33 @@ dbg!("err {}", err);
 }
 
 #[tauri::command(rename_all = "snake_case")]
+async fn add_product(title: String, description: String, price: u32) -> Result<ProductMeta, String> {
+dbg!("{}, {}, {}", &title, &description, price);
+    let sessionless = match get_sessionless().await {
+        Ok(s) => s,
+        Err(_) => return Ok(ProductMeta::default())
+    };
+
+    let sanora = Sanora::new(Some("https://dev.sanora.allyabase.com/".to_string()), Some(sessionless));
+    let uuid = match sanora.create_user().await {
+	Ok(user) => user.uuid,
+	Err(_) => return Ok(ProductMeta::default())
+    };
+dbg!("does it get to here?");
+
+    match sanora.add_product(&uuid, &title, &description, &price).await {
+	Ok(product_meta) => {
+dbg!("product_meta {}", &product_meta);
+	   Ok(product_meta)
+	}
+	Err(err) => {
+dbg!("err {}", err);
+	    Ok(ProductMeta::default())
+	}
+    }
+}
+
+#[tauri::command(rename_all = "snake_case")]
 async fn cast_spell(spell: String, total_cost: u32, mp: bool, fount_user: FountUser, destination: String, gateway_users: Vec<String>) {
 dbg!("{}, {}, {}, {}, {}", &spell, total_cost, mp, &fount_user, &destination);
     let sessionless = match get_sessionless().await {
@@ -162,7 +191,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![greet, get_teleported_html, create_fount_user, get_spellbooks, cast_spell, get_payment_intent_without_splits])
+        .invoke_handler(tauri::generate_handler![dbg, get_teleported_html, create_fount_user, get_spellbooks, cast_spell, get_payment_intent_without_splits])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

@@ -10,6 +10,8 @@
   "author": "planetnineisaspaceship",
   "license": "MIT",
   "dependencies": {
+    "dom-serializer": "^2.0.0",
+    "htmlparser2": "^9.1.0",
     "jsdom-jscore": "^0.1.0",
     "sessionless-node": "^0.11.0"
   }

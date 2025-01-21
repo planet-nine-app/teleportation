@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+
+/*elven magic-style */
+
+        .scroll-alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+	    width: 100vw;
+	    height: 100vh;
+	    pointer-events: auto;
+        }
+
+        .scroll-alert {
+            width: 320px;
+            background: #e6b800;
+            background-image: 
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E"),
+                linear-gradient(to bottom, #e6b800, #cc9900);
+            border-radius: 12px;
+            box-shadow: 
+                0 2px 10px rgba(0, 0, 0, 0.4),
+                inset 0 0 30px rgba(102, 51, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+            border: 8px solid #664d00;
+            border-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,0 C20,0 30,10 50,10 C70,10 80,0 100,0 L100,100 C80,100 70,90 50,90 C30,90 20,100 0,100 L0,0' fill='%23664d00' fill-rule='evenodd'/%3E%3C/svg%3E") 30;
+        }
+
+        .scroll-alert::before,
+        .scroll-alert::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 20px;
+            background-image: 
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 5px,
+                    rgba(102, 51, 0, 0.2) 5px,
+                    rgba(102, 51, 0, 0.2) 10px
+                );
+        }
+
+        .scroll-alert::before { top: 0; }
+        .scroll-alert::after { bottom: 0; }
+
+        .scroll-alert-content {
+            padding: 24px 20px;
+            text-align: center;
+            font-family: 'Palatino', 'Times New Roman', serif;
+        }
+
+        .scroll-alert-title {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #664d00;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            letter-spacing: 2px;
+        }
+
+        .scroll-alert-message {
+            font-size: 16px;
+            color: #000000;
+            margin: 0 0 20px;
+            line-height: 1.5;
+            font-style: italic;
+        }
+
+        .scroll-alert-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .scroll-alert-button {
+            padding: 10px 24px;
+            font-family: 'Palatino', 'Times New Roman', serif;
+            font-size: 16px;
+            color: #664d00;
+            background: rgba(255, 255, 255, 0.4);
+            border: 2px solid #664d00;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .scroll-alert-button:hover {
+            background: rgba(102, 77, 0, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .scroll-alert-button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        /* Elven vine decorations */
+        .vine {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            opacity: 0.6;
+        }
+
+        .vine-tl { top: 5px; left: 5px; transform: rotate(-90deg); }
+        .vine-tr { top: 5px; right: 5px; transform: rotate(0deg); }
+        .vine-bl { bottom: 5px; left: 5px; transform: rotate(180deg); }
+        .vine-br { bottom: 5px; right: 5px; transform: rotate(90deg); }
+
+/* iOS-style */
+        .alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .alert {
+            width: 280px;
+            background-color: rgba(205, 205, 205, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .alert-content {
+            padding: 16px;
+            text-align: center;
+        }
+
+        .alert-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #000;
+        }
+
+        .alert-message {
+            font-size: 13px;
+            color: #666;
+            margin: 0;
+        }
+
+        .alert-buttons {
+            display: flex;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .alert-button {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 12px;
+            font-size: 17px;
+            color: rgb(0, 122, 255);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .alert-button:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .alert-button:first-child {
+            border-right: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+
+    /* stripe form styling */
+        .payment-form {
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        #payment-element {
+            margin-bottom: 24px;
+        }
+        
+        #submit-button {
+            background: #5469d4;
+            color: #ffffff;
+            border-radius: 4px;
+            border: 0;
+            padding: 12px 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+        
+        #submit-button:hover {
+            filter: brightness(90%);
+        }
+        
+        #submit-button:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+        
+        .error-message {
+            color: #df1b41;
+            padding: 12px;
+            margin: 4px 0;
+            background: #ffefef;
+            border-radius: 4px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 12px 0;
+        }
+
+    </style>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/src/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tauri App</title>
+    <script type="module" src="/src/magicsky.ts" defer></script>
+    <script type="module" src="/src/stripe.ts" defer></script>
+  </head>
+
+  <body>
+    <form id="payment-form" class="payment-form" style="display: none;">
+        <div id="payment-element">
+            <!-- Stripe Elements will be inserted here -->
+        </div>
+        <button id="submit-button">Pay now</button>
+        <div id="error-message" class="error-message" style="display: none;"></div>
+        <div id="loading" class="loading">Processing payment...</div>
+    </form>
+    <main class="container">
+      <h1>Welcome to Magicsky</h1>
+      <div id="feed" class="container">
+       <div class="scroll-alert-overlay" id="scrollOverlay">
+        <div class="scroll-alert">
+            <!-- Elven vine decorations -->
+            <svg class="vine vine-tl" viewBox="0 0 100 100">
+                <path d="M10,50 Q30,30 50,40 T90,30 M50,40 Q40,50 60,55 T50,70" fill="none" stroke="#664d00" stroke-width="3"/>
+                <path d="M20,45 Q35,35 50,42 T80,35 M50,42 Q45,50 55,52 T50,65" fill="none" stroke="#664d00" stroke-width="1.5"/>
+            </svg>
+            <svg class="vine vine-tr" viewBox="0 0 100 100">
+                <path d="M10,50 Q30,30 50,40 T90,30 M50,40 Q40,50 60,55 T50,70" fill="none" stroke="#664d00" stroke-width="3"/>
+                <path d="M20,45 Q35,35 50,42 T80,35 M50,42 Q45,50 55,52 T50,65" fill="none" stroke="#664d00" stroke-width="1.5"/>
+            </svg>
+            <svg class="vine vine-bl" viewBox="0 0 100 100">
+                <path d="M10,50 Q30,30 50,40 T90,30 M50,40 Q40,50 60,55 T50,70" fill="none" stroke="#664d00" stroke-width="3"/>
+                <path d="M20,45 Q35,35 50,42 T80,35 M50,42 Q45,50 55,52 T50,65" fill="none" stroke="#664d00" stroke-width="1.5"/>
+            </svg>
+            <svg class="vine vine-br" viewBox="0 0 100 100">
+                <path d="M10,50 Q30,30 50,40 T90,30 M50,40 Q40,50 60,55 T50,70" fill="none" stroke="#664d00" stroke-width="3"/>
+                <path d="M20,45 Q35,35 50,42 T80,35 M50,42 Q45,50 55,52 T50,65" fill="none" stroke="#664d00" stroke-width="1.5"/>
+            </svg>
+            
+            <div class="scroll-alert-content">
+                <div class="scroll-alert-title">livetest</div>
+                <p class="scroll-alert-message" id="scroll-alert-message"></p>
+                <div class="scroll-alert-buttons">
+                    <button class="scroll-alert-button" onclick="hideSpellAlert()">Decline</button>
+                    <button class="scroll-alert-button" onclick="accept()" id="acceptButton">Accept</button>
+                </div>
+            </div>
+        </div>
+    </div>
+     
+      </div>
+      <button id="get-feed">Get Feed</button>
+      <p id="logger"></p>
+    </main>
+  </body>
+</html>

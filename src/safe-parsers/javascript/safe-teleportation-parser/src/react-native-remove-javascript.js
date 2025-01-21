@@ -1,66 +1,44 @@
-import parser from 'react-native-html-parser';
-const DomParser = new parser.DOMParser();
+import { parseDocument } from 'htmlparser2';
+import render from 'dom-serializer';
+
+const getTeleportTag = (html) => {
+  try {
+    // Find the teleport tag and its attributes
+    const teleportRegex = /<teleport([^>]*)>([\s\S]*?)<\/teleport>/i;
+    const match = html.match(teleportRegex);
+    
+    if (!match) {
+      console.log('No teleport tag found');
+      return null;
+    }
+
+    // Parse attributes
+    const attributesString = match[1];
+    const attributes = {};
+    const attrRegex = /(\w+)="([^"]*)"/g;
+    let attrMatch;
+    while ((attrMatch = attrRegex.exec(attributesString)) !== null) {
+      attributes[attrMatch[1]] = attrMatch[2];
+    }
+
+    // Get content and remove scripts
+    let content = match[2];
+    content = content.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    content = content.trim();
+    
+    return {
+      attributes,
+      content
+    };
+
+  } catch (err) {
+    console.error('Error processing HTML:', err);
+    return null;
+  }
+};
 
 const removeJavaScript = (html) => {
-    const dom = new DomParser().parseFromString(html, 'text/html');
-    const document = dom.window.document;
-    
-    const jsEvents = [
-        "onabort", "onanimationcancel", "onanimationend", "onanimationiteration",
-        "onanimationstart", "onauxclick", "onblur", "oncancel", "oncanplay",
-        "oncanplaythrough", "onchange", "onclick", "onclose", "oncontextmenu",
-        "oncopy", "oncuechange", "oncut", "ondblclick", "ondrag", "ondragend",
-        "ondragenter", "ondragleave", "ondragover", "ondragstart", "ondrop",
-        "ondurationchange", "onemptied", "onended", "onerror", "onfocus",
-        "onformdata", "ongotpointercapture", "oninput", "oninvalid", "onkeydown",
-        "onkeypress", "onkeyup", "onload", "onloadeddata", "onloadedmetadata",
-        "onloadstart", "onlostpointercapture", "onmousedown", "onmouseenter",
-        "onmouseleave", "onmousemove", "onmouseout", "onmouseover", "onmouseup",
-        "onpaste", "onpause", "onplay", "onplaying", "onpointercancel",
-        "onpointerdown", "onpointerenter", "onpointerleave", "onpointermove",
-        "onpointerout", "onpointerover", "onpointerup", "onprogress",
-        "onratechange", "onreset", "onresize", "onscroll", "onsecuritypolicyviolation",
-        "onseeked", "onseeking", "onselect", "onselectionchange", "onselectstart",
-        "onslotchange", "onstalled", "onsubmit", "onsuspend", "ontimeupdate",
-        "ontoggle", "ontouchcancel", "ontouchend", "ontouchmove", "ontouchstart",
-        "ontransitioncancel", "ontransitionend", "ontransitionrun", "ontransitionstart",
-        "onvolumechange", "onwaiting", "onwebkitanimationend", "onwebkitanimationiteration",
-        "onwebkitanimationstart", "onwebkittransitionend", "onwheel"
-    ];
-
-    document.querySelectorAll('script, noscript').forEach(element => {
-        element.remove();
-    });
-
-    const urlRegex = /^(?:javascript|data):/i;
-    document.querySelectorAll('[href], [src], [data]').forEach(element => {
-        ['href', 'src', 'data'].forEach(attr => {
-            if (element.hasAttribute(attr)) {
-                const value = element.getAttribute(attr).trim();
-                if (urlRegex.test(value)) {
-                    element.remove();
-                }
-            }
-        });
-    });
-
-    const expressionRegex = /expression\s*\(/i;
-    document.querySelectorAll('[style]').forEach(element => {
-        const style = element.getAttribute('style');
-        if (style && expressionRegex.test(style)) {
-            element.remove();
-        }
-    });
-
-    document.querySelectorAll('*').forEach(element => {
-        jsEvents.forEach(event => {
-            if (element.hasAttribute(event)) {
-                element.removeAttribute(event);
-            }
-        });
-    });
-
-    return dom;
-}
+  return getTeleportTag(html);
+};
 
 export default removeJavaScript;

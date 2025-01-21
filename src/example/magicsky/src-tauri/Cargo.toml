@@ -37,3 +37,8 @@ path = "../../../../../bdo/src/client/rust/bdo-rs"
 
 [dependencies.addie-rs]
 path = "../../../../../addie/src/client/rust/addie-rs"
+
+[dependencies.sanora-rs]
+path = "../../../../../sanora-dot-club/src/client/rust/sanora-rs"
+
+
