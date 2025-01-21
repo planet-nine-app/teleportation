@@ -2,6 +2,8 @@
 
 *Teleportation* is a lightweight protocol for making already developed content available to other servers to enable discovery outside of the traditional search engine flow.
 
+[Here is a quick video of what teleportation can do][video]
+
 ## Overview
 
 I would like to introduce you to [the spatty][spatty].
@@ -29,3 +31,4 @@ Below are links to the developer and UX READMEs for Teleportation:
 [README-DEV]: ./README-DEV.md
 [README-UX]: ./README-UX.md
 [spatty]: https://thespatty.com/
+[video]: https://vimeo.com/1037625246?share=copy#t=0
