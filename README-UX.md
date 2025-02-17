@@ -105,6 +105,15 @@ Two wrapping tags that do nothing to your site whatsoever.
 Web crawlers find these tags and propogate them to teleportals. 
 Teleportals connect users to this content.
 
+The user experience of these teleportals can be whatever metaphor you'd like:
+
+* A mall with different shops
+* A town square with roads leading to different quadrants to explore
+* Open content systems can sell things right within them
+* Put them in games
+* Put them in blogs
+* So on and so forth
+
 Together with [Sessionless](https://github.com/planet-nine-app/sessionless) and [MAGIC](https://github.com/planet-nine-app/MAGIC), purchases can be made *without* ever travelling to the site. 
 
 ## What else can teleportation do?
@@ -144,9 +153,9 @@ Whether they do or not is up to them of course, but the point is the protocol is
 So teleportation uses [Sessionless](www.github.com/planet-nine-app/sessionless), and [MAGIC](www.github.com/planet-nine-app/MAGIC) to allow one tap/click interactions with teleported elements.
 This can be to buy, sign up, join a meetup, subscribe... really any interaction you can do on the internet, teleportation, Sessionless, and MAGIC can do. 
 
-Maybe it's better to see a demo:
+[Maybe it's better to see a demo][video]
 
-<Cool demo here>
+
 
 ## Use Cases
 
@@ -162,3 +171,5 @@ Maybe it's better to see a demo:
 * restaurants
 
 [a blog on the first page!]: https://www.thewanderingclimber.com/best-rock-climbing-carabiners/
+[video]: https://vimeo.com/1037625246?share=copy#t=0
+

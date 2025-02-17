@@ -102,6 +102,7 @@ console.log('osfPosts', osfPosts);
       }
 console.log(item);
 console.log(item.post);
+console.log(JSON.stringify(item));
 
       let postHTML = `
 	<h3>${item.post.author.displayName}</h3>
