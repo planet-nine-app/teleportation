@@ -17,6 +17,12 @@ app.get('/teleport/:url', async (req, res) => {
 console.log(teleportTag);
   const isValid = await safeTeleportationParser.isValidTag(teleportTag);
 console.log(isValid);
+  
+  if(isValid) {
+    return res.send({valid: true, ...teleportTag});
+  } 
+  
+  res.send({valid: false});
 });
 
 app.use(express.static(path.resolve('./')));

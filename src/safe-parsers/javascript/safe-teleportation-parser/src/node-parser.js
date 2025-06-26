@@ -49,6 +49,7 @@ console.log(teleported);
   },
 
   isValidTag: (teleportTag) => {
+console.log('verifying', teleportTag.signature, teleportTag.message, teleportTag.teleporterPubKey);
     return sessionless.verifySignature(teleportTag.signature, teleportTag.message, teleportTag.teleporterPubKey);
   }
 };

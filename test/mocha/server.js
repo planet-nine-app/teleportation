@@ -27,6 +27,15 @@ const _delete = async function(path, body) {
 };
 
 it('should grab a teleported tag', async () => {
-  const res = await get('http://127.0.0.1:2970/teleport/https%3A%2F%2Fpeaceloveandredistribution.com%2Fa-brief-history-of-teleportation%3FpubKey%3D032ec8077c5d59a9716dc1937a5388558b44a92fd93e26917c2d51a8e9922a2933');
+  const res = await get('http://127.0.0.1:2970/teleport/https%3A%2F%2Fpeaceloveandredistribution.com%2Fa-brief-history-of-teleportation%3FpubKey%3D023031231f669c6504ef5939b6b5e22d2d8be76cf46e98297b810138933de2494f');
 console.log(res.body);
+
+  res.body.valid.should.equal(true);
+});
+
+it('should tell when a teleported tag is invalid', async () => {
+  const res = await get('http://127.0.0.1:2970/teleport/https%3A%2F%2Fpeaceloveandredistribution.com%2Fa-brief-history-of-teleportation%3FpubKey%3D023031231f669c6504ef5939b6b5e22d2d8be76cf46e98297b810138933de2494e');
+console.log(res.body);
+
+  res.body.valid.should.equal(false);
 });
