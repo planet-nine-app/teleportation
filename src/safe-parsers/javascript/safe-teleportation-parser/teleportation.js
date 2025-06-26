@@ -1,3 +1,3 @@
-import safeTeleportationParser from './safe-teleportation-parser.js';
+import safeTeleportationParser from './src/node-parser.js';
 
 export default safeTeleportationParser;

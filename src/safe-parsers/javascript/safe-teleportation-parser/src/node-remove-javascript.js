@@ -1,4 +1,4 @@
-import JSDOM from 'jsdom-jscore';
+import { JSDOM } from 'jsdom';
 
 const removeJavaScript = (html) => {
     const dom = new JSDOM(html);
@@ -36,6 +36,12 @@ const removeJavaScript = (html) => {
     // Remove javascript: and data: URLs
     const urlRegex = /^(?:javascript|data):/i;
     document.querySelectorAll('[href], [src], [data]').forEach(element => {
+console.log(element.tagName);
+        if (element.tagName.toLowerCase() === 'teleport') {
+console.log('it\s a teleport tag');
+            return;
+        }
+
         ['href', 'src', 'data'].forEach(attr => {
             if (element.hasAttribute(attr)) {
                 const value = element.getAttribute(attr).trim();
@@ -65,7 +71,7 @@ const removeJavaScript = (html) => {
     });
 
     // Return the sanitized HTML
-    return dom.serialize();
+    return dom;
 }
 
 export default removeJavaScript;
