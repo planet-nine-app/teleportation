@@ -27,7 +27,8 @@ const _delete = async function(path, body) {
 };
 
 it('should grab a teleported tag', async () => {
-  const res = await get('http://127.0.0.1:2970/teleport/https%3A%2F%2Fpeaceloveandredistribution.com%2Fa-brief-history-of-teleportation%3FpubKey%3D023031231f669c6504ef5939b6b5e22d2d8be76cf46e98297b810138933de2494f');
+  const res = await get('http://127.0.0.1:2970/teleport/https%3A%2F%2Fpeaceloveandredistribution.com%2Fi-go-to-eleven%3FpubKey%3D023031231f669c6504ef5939b6b5e22d2d8be76cf46e98297b810138933de2494f');
+//  const res = await get('http://127.0.0.1:2970/teleport/https%3A%2F%2Fpeaceloveandredistribution.com%2Fa-brief-history-of-teleportation%3FpubKey%3D023031231f669c6504ef5939b6b5e22d2d8be76cf46e98297b810138933de2494f');
 console.log(res.body);
 
   res.body.valid.should.equal(true);
