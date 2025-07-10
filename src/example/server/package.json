@@ -1,0 +1,38 @@
+{
+  "name": "headless-browser-teleporter",
+  "version": "1.0.0",
+  "description": "Headless browser-based teleportation system for extracting content from <teleport> tags",
+  "main": "headless-browser-teleporter.js",
+  "scripts": {
+    "start": "node example-server.js server",
+    "test": "node example-server.js basic",
+    "test:advanced": "node example-server.js advanced",
+    "test:batch": "node example-server.js batch",
+    "example:basic": "node example-server.js basic",
+    "example:server": "node example-server.js server",
+    "example:batch": "node example-server.js batch"
+  },
+  "dependencies": {
+    "puppeteer": "latest",
+    "express": "^4.18.2"
+  },
+  "keywords": [
+    "teleportation",
+    "headless-browser",
+    "content-extraction",
+    "puppeteer",
+    "web-scraping",
+    "dom-rendering"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "headless-browser-teleporter.js",
+    "teleportation-client-utils.js",
+    "example-server.js",
+    "README.md"
+  ]
+}

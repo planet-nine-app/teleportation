@@ -1,0 +1,316 @@
+/* Button Container CSS with 'bn' namespace */
+
+.bn-button-container {
+    background: var(--bn-container-bg, transparent);
+    border-radius: var(--bn-container-border-radius, 8px);
+    padding: var(--bn-container-padding, 16px);
+    margin: var(--bn-container-margin, 0);
+    border: var(--bn-container-border, none);
+    display: flex;
+    flex-direction: var(--bn-container-direction, row);
+    gap: var(--bn-container-gap, 12px);
+    align-items: var(--bn-container-align, center);
+    justify-content: var(--bn-container-justify, center);
+    flex-wrap: var(--bn-container-wrap, nowrap);
+    min-height: var(--bn-container-min-height, auto);
+    width: var(--bn-container-width, 100%);
+    box-sizing: border-box;
+}
+
+/* Layout variants */
+.bn-button-container.bn-horizontal {
+    flex-direction: row;
+    align-items: center;
+}
+
+.bn-button-container.bn-vertical {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.bn-button-container.bn-grid {
+    display: grid;
+    grid-template-columns: var(--bn-grid-columns, repeat(auto-fit, minmax(150px, 1fr)));
+    grid-gap: var(--bn-container-gap, 12px);
+}
+
+.bn-button-container.bn-wrap {
+    flex-wrap: wrap;
+}
+
+/* Spacing variants */
+.bn-button-container.bn-compact {
+    --bn-container-padding: 8px;
+    --bn-container-gap: 8px;
+}
+
+.bn-button-container.bn-spacious {
+    --bn-container-padding: 24px;
+    --bn-container-gap: 20px;
+}
+
+/* Button base styles */
+.bn-button {
+    border: none;
+    border-radius: var(--bn-button-border-radius, 8px);
+    font-family: var(--bn-button-font-family, inherit);
+    font-size: var(--bn-button-font-size, 14px);
+    font-weight: var(--bn-button-font-weight, 600);
+    line-height: 1;
+    padding: var(--bn-button-padding, 14px 20px);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--bn-button-icon-gap, 8px);
+    min-height: var(--bn-button-min-height, 48px);
+    box-shadow: var(--bn-button-shadow, 0 2px 8px rgba(0, 0, 0, 0.1));
+    white-space: nowrap;
+    user-select: none;
+    box-sizing: border-box;
+}
+
+.bn-button:hover {
+    transform: var(--bn-button-hover-transform, translateY(-2px));
+    box-shadow: var(--bn-button-hover-shadow, 0 4px 16px rgba(0, 0, 0, 0.15));
+}
+
+.bn-button:active {
+    transform: var(--bn-button-active-transform, translateY(-1px));
+}
+
+.bn-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.bn-button:focus-visible {
+    outline: 2px solid var(--bn-button-focus-color, #3b82f6);
+    outline-offset: 2px;
+}
+
+/* Button icon */
+.bn-button-icon {
+    width: var(--bn-button-icon-size, 16px);
+    height: var(--bn-button-icon-size, 16px);
+    flex-shrink: 0;
+}
+
+/* Button sizing variants */
+.bn-button.bn-small {
+    --bn-button-padding: 8px 16px;
+    --bn-button-font-size: 12px;
+    --bn-button-min-height: 36px;
+    --bn-button-icon-size: 14px;
+}
+
+.bn-button.bn-large {
+    --bn-button-padding: 18px 32px;
+    --bn-button-font-size: 16px;
+    --bn-button-min-height: 56px;
+    --bn-button-icon-size: 20px;
+}
+
+.bn-button.bn-full-width {
+    width: 100%;
+}
+
+.bn-button.bn-auto-width {
+    width: auto;
+    flex: 0 0 auto;
+}
+
+/* Button style variants */
+.bn-button.bn-primary {
+    background: var(--bn-primary-bg, linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%));
+    color: var(--bn-primary-color, white);
+}
+
+.bn-button.bn-primary:hover {
+    background: var(--bn-primary-hover-bg, linear-gradient(135deg, #2563eb 0%, #7c3aed 100%));
+}
+
+.bn-button.bn-secondary {
+    background: var(--bn-secondary-bg, linear-gradient(135deg, #64748b 0%, #475569 100%));
+    color: var(--bn-secondary-color, white);
+}
+
+.bn-button.bn-secondary:hover {
+    background: var(--bn-secondary-hover-bg, linear-gradient(135deg, #475569 0%, #334155 100%));
+}
+
+.bn-button.bn-success {
+    background: var(--bn-success-bg, linear-gradient(135deg, #10b981 0%, #059669 100%));
+    color: var(--bn-success-color, white);
+}
+
+.bn-button.bn-success:hover {
+    background: var(--bn-success-hover-bg, linear-gradient(135deg, #059669 0%, #047857 100%));
+}
+
+.bn-button.bn-warning {
+    background: var(--bn-warning-bg, linear-gradient(135deg, #f59e0b 0%, #d97706 100%));
+    color: var(--bn-warning-color, white);
+}
+
+.bn-button.bn-warning:hover {
+    background: var(--bn-warning-hover-bg, linear-gradient(135deg, #d97706 0%, #b45309 100%));
+}
+
+.bn-button.bn-danger {
+    background: var(--bn-danger-bg, linear-gradient(135deg, #ef4444 0%, #dc2626 100%));
+    color: var(--bn-danger-color, white);
+}
+
+.bn-button.bn-danger:hover {
+    background: var(--bn-danger-hover-bg, linear-gradient(135deg, #dc2626 0%, #b91c1c 100%));
+}
+
+.bn-button.bn-outline {
+    background: var(--bn-outline-bg, transparent);
+    border: 2px solid var(--bn-outline-border-color, #3b82f6);
+    color: var(--bn-outline-color, #3b82f6);
+    box-shadow: none;
+}
+
+.bn-button.bn-outline:hover {
+    background: var(--bn-outline-hover-bg, #3b82f6);
+    color: var(--bn-outline-hover-color, white);
+}
+
+.bn-button.bn-ghost {
+    background: var(--bn-ghost-bg, transparent);
+    color: var(--bn-ghost-color, #374151);
+    box-shadow: none;
+}
+
+.bn-button.bn-ghost:hover {
+    background: var(--bn-ghost-hover-bg, rgba(0, 0, 0, 0.05));
+}
+
+.bn-button.bn-text {
+    background: transparent;
+    color: var(--bn-text-color, #3b82f6);
+    box-shadow: none;
+    text-decoration: underline;
+    padding: var(--bn-text-padding, 8px 12px);
+}
+
+.bn-button.bn-text:hover {
+    text-decoration: none;
+    background: var(--bn-text-hover-bg, rgba(59, 130, 246, 0.1));
+}
+
+/* Icon-only button variant */
+.bn-button.bn-icon-only {
+    padding: var(--bn-icon-only-padding, 12px);
+    width: var(--bn-icon-only-size, 48px);
+    height: var(--bn-icon-only-size, 48px);
+    min-height: auto;
+    border-radius: var(--bn-icon-only-border-radius, 50%);
+}
+
+.bn-button.bn-icon-only.bn-small {
+    --bn-icon-only-size: 36px;
+    --bn-icon-only-padding: 8px;
+}
+
+.bn-button.bn-icon-only.bn-large {
+    --bn-icon-only-size: 64px;
+    --bn-icon-only-padding: 16px;
+}
+
+/* Button loading state */
+.bn-button.bn-loading {
+    pointer-events: none;
+    position: relative;
+}
+
+.bn-button.bn-loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: bn-spin 1s linear infinite;
+}
+
+@keyframes bn-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Container alignment utilities */
+.bn-align-left {
+    justify-content: flex-start;
+}
+
+.bn-align-center {
+    justify-content: center;
+}
+
+.bn-align-right {
+    justify-content: flex-end;
+}
+
+.bn-align-between {
+    justify-content: space-between;
+}
+
+.bn-align-around {
+    justify-content: space-around;
+}
+
+.bn-align-evenly {
+    justify-content: space-evenly;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .bn-button-container.bn-responsive {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .bn-button-container.bn-responsive .bn-button {
+        width: 100%;
+    }
+    
+    .bn-button-container.bn-grid.bn-responsive {
+        grid-template-columns: 1fr;
+    }
+    
+    .bn-button {
+        font-size: var(--bn-button-font-size-mobile, 16px);
+        min-height: var(--bn-button-min-height-mobile, 44px);
+    }
+}
+
+/* Dark theme variant */
+.bn-button-container.bn-dark-theme {
+    --bn-primary-bg: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+    --bn-secondary-bg: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+    --bn-ghost-color: #e5e7eb;
+    --bn-ghost-hover-bg: rgba(255, 255, 255, 0.1);
+    --bn-text-color: #60a5fa;
+    --bn-outline-border-color: #60a5fa;
+    --bn-outline-color: #60a5fa;
+}
+
+/* Light theme variant */
+.bn-button-container.bn-light-theme {
+    --bn-primary-bg: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    --bn-secondary-bg: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    --bn-ghost-color: #374151;
+    --bn-ghost-hover-bg: rgba(0, 0, 0, 0.05);
+    --bn-text-color: #3b82f6;
+    --bn-outline-border-color: #3b82f6;
+    --bn-outline-color: #3b82f6;
+}

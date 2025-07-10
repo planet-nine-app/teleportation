@@ -1,0 +1,334 @@
+/* Form Widget CSS with 'fn' namespace */
+
+.fn-form-widget {
+    background: var(--form-bg, #2a2a2e);
+    border-radius: var(--form-border-radius, 8px);
+    padding: var(--form-padding, 20px);
+    margin: var(--form-margin, 20px 0);
+    border: 1px solid var(--form-border-color, #444);
+    font-family: Arial, sans-serif;
+    color: var(--form-text-color, #ffffff);
+}
+
+.fn-form-field {
+    margin-bottom: var(--form-field-margin, 20px);
+}
+
+.fn-form-field:last-child {
+    margin-bottom: 0;
+}
+
+.fn-form-label {
+    display: block;
+    margin-bottom: var(--form-label-margin, 8px);
+    font-weight: var(--form-label-weight, bold);
+    color: var(--form-label-color, #ffffff);
+    font-size: var(--form-label-size, 14px);
+}
+
+.fn-form-input {
+    width: 100%;
+    padding: var(--form-input-padding, 12px);
+    background: var(--form-input-bg, #1c1c20);
+    border: 2px solid var(--form-input-border, #444);
+    border-radius: var(--form-input-border-radius, 6px);
+    color: var(--form-input-color, #ffffff);
+    font-size: var(--form-input-size, 14px);
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.fn-form-input:focus {
+    outline: none;
+    border-color: var(--form-input-focus-border, #8b5cf6);
+    box-shadow: 0 0 0 3px var(--form-input-focus-shadow, rgba(139, 92, 246, 0.2));
+}
+
+.fn-form-input::placeholder {
+    color: var(--form-input-placeholder, #888);
+}
+
+.fn-form-textarea {
+    width: 100%;
+    padding: var(--form-textarea-padding, 12px);
+    background: var(--form-textarea-bg, #1c1c20);
+    border: 2px solid var(--form-textarea-border, #444);
+    border-radius: var(--form-textarea-border-radius, 6px);
+    color: var(--form-textarea-color, #ffffff);
+    font-size: var(--form-textarea-size, 14px);
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+    resize: vertical;
+    min-height: var(--form-textarea-min-height, 80px);
+}
+
+.fn-form-textarea:focus {
+    outline: none;
+    border-color: var(--form-textarea-focus-border, #8b5cf6);
+    box-shadow: 0 0 0 3px var(--form-textarea-focus-shadow, rgba(139, 92, 246, 0.2));
+}
+
+.fn-form-textarea::placeholder {
+    color: var(--form-textarea-placeholder, #888);
+}
+
+.fn-char-counter {
+    font-size: var(--form-counter-size, 12px);
+    color: var(--form-counter-color, #bbbbbb);
+    margin-top: var(--form-counter-margin, 4px);
+    text-align: right;
+}
+
+.fn-char-counter.fn-warning {
+    color: var(--form-counter-warning, #f59e0b);
+}
+
+.fn-char-counter.fn-error {
+    color: var(--form-counter-error, #ef4444);
+}
+
+.fn-datetime-section {
+    background: var(--form-datetime-bg, #2a2a2e);
+    border-radius: var(--form-datetime-border-radius, 8px);
+    padding: var(--form-datetime-padding, 15px);
+    margin: var(--form-datetime-margin, 10px 0);
+    border: 1px solid var(--form-datetime-border, #444);
+}
+
+.fn-datetime-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--form-datetime-gap, 15px);
+    margin-bottom: var(--form-datetime-grid-margin, 15px);
+}
+
+.fn-datetime-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.fn-datetime-label {
+    color: var(--form-datetime-label-color, #bbbbbb);
+    font-size: var(--form-datetime-label-size, 12px);
+    margin-bottom: var(--form-datetime-label-margin, 5px);
+    font-family: inherit;
+}
+
+.fn-time-input {
+    background: var(--form-time-bg, #1c1c20);
+    border: 2px solid var(--form-time-border, #444);
+    border-radius: var(--form-time-border-radius, 6px);
+    color: var(--form-time-color, #ffffff);
+    padding: var(--form-time-padding, 8px 12px);
+    font-size: var(--form-time-size, 14px);
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+}
+
+.fn-time-input:focus {
+    outline: none;
+    border-color: var(--form-time-focus-border, #8b5cf6);
+    box-shadow: 0 0 0 3px var(--form-time-focus-shadow, rgba(139, 92, 246, 0.2));
+}
+
+.fn-add-event-btn {
+    background: var(--form-add-event-bg, linear-gradient(90deg, #10b981, #8b5cf6));
+    border: none;
+    color: var(--form-add-event-color, #ffffff);
+    padding: var(--form-add-event-padding, 10px 20px);
+    border-radius: var(--form-add-event-border-radius, 6px);
+    cursor: pointer;
+    font-weight: var(--form-add-event-weight, bold);
+    font-family: inherit;
+    transition: opacity 0.3s ease;
+    font-size: var(--form-add-event-size, 14px);
+}
+
+.fn-add-event-btn:hover {
+    opacity: 0.9;
+}
+
+.fn-add-event-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.fn-events-list {
+    margin-top: var(--form-events-margin, 15px);
+}
+
+.fn-event-item {
+    background: var(--form-event-bg, #1c1c20);
+    border: 1px solid var(--form-event-border, #444);
+    border-radius: var(--form-event-border-radius, 6px);
+    padding: var(--form-event-padding, 10px);
+    margin-bottom: var(--form-event-margin, 8px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fn-event-text {
+    color: var(--form-event-color, #ffffff);
+    font-size: var(--form-event-size, 14px);
+}
+
+.fn-remove-event-btn {
+    background: var(--form-remove-event-bg, #ef4444);
+    border: none;
+    color: var(--form-remove-event-color, #ffffff);
+    padding: var(--form-remove-event-padding, 4px 8px);
+    border-radius: var(--form-remove-event-border-radius, 4px);
+    cursor: pointer;
+    font-size: var(--form-remove-event-size, 12px);
+    font-weight: var(--form-remove-event-weight, bold);
+    transition: background-color 0.3s ease;
+}
+
+.fn-remove-event-btn:hover {
+    background: var(--form-remove-event-hover-bg, #dc2626);
+}
+
+.fn-image-upload-container {
+    border: 2px dashed var(--form-image-border, #6b7280);
+    border-radius: var(--form-image-border-radius, 8px);
+    padding: var(--form-image-padding, 20px);
+    text-align: center;
+    background: var(--form-image-bg, #374151);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    color: var(--form-image-color, #d1d5db);
+    position: relative;
+}
+
+.fn-image-upload-container:hover {
+    background: var(--form-image-hover-bg, #4b5563);
+    border-color: var(--form-image-hover-border, #8b5cf6);
+}
+
+.fn-image-upload-container.fn-has-image {
+    border-style: solid;
+    border-color: var(--form-image-success-border, #10b981);
+}
+
+.fn-image-preview {
+    max-width: 100%;
+    max-height: var(--form-image-preview-height, 200px);
+    border-radius: var(--form-image-preview-border-radius, 8px);
+    margin-top: var(--form-image-preview-margin, 10px);
+}
+
+.fn-image-upload-text {
+    font-size: var(--form-image-text-size, 14px);
+    margin-bottom: var(--form-image-text-margin, 10px);
+}
+
+.fn-image-url-input {
+    width: 100%;
+    padding: var(--form-image-input-padding, 8px);
+    background: var(--form-image-input-bg, #1c1c20);
+    border: 2px solid var(--form-image-input-border, #444);
+    border-radius: var(--form-image-input-border-radius, 6px);
+    color: var(--form-image-input-color, #ffffff);
+    font-size: var(--form-image-input-size, 14px);
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.fn-image-url-input:focus {
+    outline: none;
+    border-color: var(--form-image-input-focus-border, #8b5cf6);
+    box-shadow: 0 0 0 3px var(--form-image-input-focus-shadow, rgba(139, 92, 246, 0.2));
+}
+
+.fn-image-url-input::placeholder {
+    color: var(--form-image-input-placeholder, #888);
+}
+
+.fn-remove-image-btn {
+    position: absolute;
+    top: var(--form-remove-image-top, 10px);
+    right: var(--form-remove-image-right, 10px);
+    background: var(--form-remove-image-bg, #ef4444);
+    border: none;
+    color: var(--form-remove-image-color, #ffffff);
+    padding: var(--form-remove-image-padding, 4px 8px);
+    border-radius: var(--form-remove-image-border-radius, 4px);
+    cursor: pointer;
+    font-size: var(--form-remove-image-size, 12px);
+    font-weight: var(--form-remove-image-weight, bold);
+    transition: background-color 0.3s ease;
+}
+
+.fn-remove-image-btn:hover {
+    background: var(--form-remove-image-hover-bg, #dc2626);
+}
+
+.fn-text-block {
+    background: var(--form-text-block-bg, #1f2937);
+    border-left: 4px solid var(--form-text-block-border, #8b5cf6);
+    border-radius: var(--form-text-block-border-radius, 8px);
+    padding: var(--form-text-block-padding, 15px);
+    margin-bottom: var(--form-text-block-margin, 15px);
+    color: var(--form-text-block-color, #ffffff);
+    font-size: var(--form-text-block-size, 14px);
+    line-height: var(--form-text-block-line-height, 1.6);
+}
+
+.fn-form-error {
+    color: var(--form-error-color, #ef4444);
+    font-size: var(--form-error-size, 12px);
+    margin-top: var(--form-error-margin, 4px);
+}
+
+.fn-form-success {
+    color: var(--form-success-color, #10b981);
+    font-size: var(--form-success-size, 12px);
+    margin-top: var(--form-success-margin, 4px);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .fn-datetime-grid {
+        grid-template-columns: 1fr;
+        gap: var(--form-datetime-gap-mobile, 10px);
+    }
+    
+    .fn-form-widget {
+        padding: var(--form-padding-mobile, 15px);
+    }
+    
+    .fn-form-input,
+    .fn-form-textarea {
+        font-size: var(--form-input-size-mobile, 16px);
+    }
+}
+
+/* Dark theme variant */
+.fn-form-widget.fn-dark-theme {
+    --form-bg: #1f2937;
+    --form-border-color: #374151;
+    --form-text-color: #f9fafb;
+    --form-input-bg: #111827;
+    --form-input-border: #374151;
+    --form-input-color: #f9fafb;
+    --form-datetime-bg: #111827;
+    --form-time-bg: #0f172a;
+}
+
+/* Light theme variant */
+.fn-form-widget.fn-light-theme {
+    --form-bg: #ffffff;
+    --form-border-color: #e5e7eb;
+    --form-text-color: #1f2937;
+    --form-input-bg: #f9fafb;
+    --form-input-border: #d1d5db;
+    --form-input-color: #1f2937;
+    --form-datetime-bg: #f3f4f6;
+    --form-time-bg: #ffffff;
+    --form-image-bg: #f3f4f6;
+    --form-image-hover-bg: #e5e7eb;
+}
