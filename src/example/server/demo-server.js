@@ -1,5 +1,6 @@
 // demo-server.js
 // Demo server that teleports content from Ye Olde Appe Shoppe
+// Updated with side-by-side layout: Appe Shoppe (2/3) + Teleportation Demo (1/3)
 
 const express = require('express');
 const path = require('path');
@@ -29,10 +30,23 @@ try {
 const app = express();
 const port = 3001;
 
-// Serve static files (for hosting Ye Olde Appe Shoppe locally)
-app.use('/shoppe', express.static(path.join(__dirname, 'ye-olde-appe-shoppe')));
+// Serve static files from the ye-olde-appe-shoppe directory
+app.use('/ye-olde-appe-shoppe', express.static(path.join(__dirname, 'ye-olde-appe-shoppe')));
 
-// Demo page that shows teleported content
+// Also serve individual files for the appe shoppe
+app.use('/pn-post-component.css', express.static(path.join(__dirname, 'pn-post-component.css')));
+app.use('/bn-button-container.css', express.static(path.join(__dirname, 'bn-button-container.css')));
+app.use('/fn-form-component.css', express.static(path.join(__dirname, 'fn-form-component.css')));
+app.use('/pn-post-component.js', express.static(path.join(__dirname, 'pn-post-component.js')));
+app.use('/bn-button-container.js', express.static(path.join(__dirname, 'bn-button-container.js')));
+app.use('/fn-form-component.js', express.static(path.join(__dirname, 'fn-form-component.js')));
+app.use('/hn-header-or-footer.js', express.static(path.join(__dirname, 'hn-header-or-footer.js')));
+app.use('/vs-vertical-stack.js', express.static(path.join(__dirname, 'vs-vertical-stack.js')));
+app.use('/allyabase-web.js', express.static(path.join(__dirname, 'allyabase-web.js')));
+app.use('/allyabase-tauri.js', express.static(path.join(__dirname, 'allyabase-tauri.js')));
+app.use('/app-shoppe-logic.js', express.static(path.join(__dirname, 'app-shoppe-logic.js')));
+
+// Demo page with side-by-side layout
 app.get('/', (req, res) => {
   res.send(`
 <!DOCTYPE html>
@@ -40,157 +54,332 @@ app.get('/', (req, res) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teleportation Demo</title>
+    <title>🚀 Teleportation Demo - Live Side-by-Side</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+            margin: 0;
+            padding: 0;
             background: #f8fafc;
+            height: 100vh;
+            overflow: hidden;
         }
         
-        .header {
+        .demo-header {
+            background: linear-gradient(90deg, #7c3aed 0%, #059669 100%);
+            padding: 15px 20px;
             text-align: center;
-            margin-bottom: 2rem;
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            border-bottom: 3px solid #ec4899;
+            position: relative;
+            z-index: 1000;
         }
         
-        .demo-section {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        .demo-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.8);
+            margin: 0;
+        }
+        
+        .demo-subtitle {
+            font-size: 0.9rem;
+            color: #fbbf24;
+            font-style: italic;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            margin: 5px 0 0 0;
+        }
+        
+        .main-layout {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+        
+        .appe-shoppe-panel {
+            width: 66.67%;
+            background: #ffffff;
+            border-right: 3px solid #ec4899;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .shoppe-header {
+            background: linear-gradient(90deg, #0316FC 0%, #FCFC03 100%);
+            padding: 10px 20px;
+            color: #1f2937;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 2px solid #7C7C7C;
+            position: relative;
+            z-index: 100;
+        }
+        
+        .shoppe-iframe {
+            width: 100%;
+            height: calc(100% - 50px);
+            border: none;
+            background: #E1E0DD;
+        }
+        
+        .teleportation-panel {
+            width: 33.33%;
+            background: rgba(45, 27, 105, 0.95);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .teleport-header {
+            background: rgba(124, 58, 237, 0.9);
+            color: #ffffff;
+            padding: 15px 20px;
+            border-bottom: 2px solid #ec4899;
+            text-align: center;
+        }
+        
+        .teleport-header h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
         }
         
         .teleport-controls {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            align-items: center;
+            padding: 20px;
+            background: rgba(45, 27, 105, 0.4);
+            border-bottom: 2px solid #7c3aed;
         }
         
-        .teleport-controls input {
-            flex: 1;
+        .teleport-url-input {
+            width: 100%;
             padding: 12px;
-            border: 1px solid #ddd;
+            background: #1e1e2e;
+            border: 2px solid #7c3aed;
             border-radius: 8px;
+            color: #f8f8f2;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        
+        .teleport-url-input:focus {
+            outline: none;
+            border-color: #ec4899;
+            box-shadow: 0 0 15px rgba(236, 72, 153, 0.4);
+        }
+        
+        .teleport-button {
+            width: 100%;
+            background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+            color: white;
+            border: 2px solid #7c3aed;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
             font-size: 14px;
         }
         
-        .teleport-controls button {
-            padding: 12px 24px;
-            background: #3b82f6;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
+        .teleport-button:hover {
+            background: linear-gradient(135deg, #8b5cf6 0%, #f472b6 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(124, 58, 237, 0.4);
         }
         
-        .teleport-controls button:hover {
-            background: #2563eb;
+        .teleport-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status-area {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+            background: rgba(45, 27, 105, 0.2);
         }
         
         .status {
             padding: 12px;
             border-radius: 8px;
-            margin-bottom: 1rem;
+            margin-bottom: 15px;
             font-weight: 500;
+            font-size: 14px;
         }
         
         .status.loading {
-            background: #fef3c7;
-            color: #92400e;
+            background: rgba(251, 191, 36, 0.3);
+            color: #fbbf24;
             border: 1px solid #fcd34d;
         }
         
         .status.success {
-            background: #dcfce7;
-            color: #166534;
+            background: rgba(16, 185, 129, 0.3);
+            color: #10b981;
             border: 1px solid #86efac;
         }
         
         .status.error {
-            background: #fee2e2;
-            color: #dc2626;
+            background: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
             border: 1px solid #fca5a5;
         }
         
         .teleported-content {
-            border: 2px dashed #3b82f6;
+            background: rgba(45, 27, 105, 0.4);
+            border: 2px dashed #7c3aed;
             border-radius: 12px;
-            padding: 1rem;
+            padding: 20px;
             min-height: 200px;
-            background: #f8fafc;
+            max-height: 400px;
+            overflow-y: auto;
+            color: #e5e7eb;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .teleported-content.has-content {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
         }
         
         .metadata {
-            background: #f3f4f6;
+            background: rgba(30, 30, 46, 0.8);
             border-radius: 8px;
-            padding: 1rem;
-            margin-top: 1rem;
-            font-size: 14px;
-            color: #6b7280;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #a78bfa;
+            font-family: 'Courier New', monospace;
         }
         
-        .iframe-container {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 1rem;
+        .metadata h4 {
+            color: #ec4899;
+            margin: 0 0 10px 0;
+            font-size: 14px;
+        }
+        
+        .auto-teleport-notice {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid #10b981;
+            color: #10b981;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(45, 27, 105, 0.4);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #7c3aed 0%, #ec4899 100%);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #8b5cf6 0%, #f472b6 100%);
+        }
+        
+        .pn-post-card {
+            margin-bottom: 15px !important;
+            transform: scale(0.9) !important;
+            border: 1px solid #7c3aed !important;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🚀 Teleportation Demo</h1>
-        <p>Extract content from Ye Olde Appe Shoppe using headless browser teleportation</p>
+    <div class="demo-header">
+        <h1 class="demo-title">🚀 Live Teleportation Demo 🏰</h1>
+        <p class="demo-subtitle">Watch content teleport from Ye Olde Appe Shoppe in real-time!</p>
     </div>
-    
-    <div class="demo-section">
-        <h2>🏰 Source: Ye Olde Appe Shoppe</h2>
-        <p>This is the original Ye Olde Appe Shoppe running with teleport tags:</p>
-        <div class="iframe-container">
-            <iframe src="/shoppe/ye-olde-appe-shoppe.html" width="100%" height="600" frameborder="0"></iframe>
+
+    <div class="main-layout">
+        <!-- Ye Olde Appe Shoppe Panel (2/3 width) -->
+        <div class="appe-shoppe-panel">
+            <div class="shoppe-header">
+                🏰 Ye Olde Appe Shoppe - Source Application (Light Theme)
+            </div>
+            <iframe 
+                class="shoppe-iframe" 
+                src="/ye-olde-appe-shoppe/ye-olde-appe-shoppe.html"
+                title="Ye Olde Appe Shoppe">
+            </iframe>
         </div>
-        <p><em>The post feed in the preview above is wrapped in &lt;teleport&gt; tags</em></p>
-    </div>
-    
-    <div class="demo-section">
-        <h2>📡 Teleportation Controls</h2>
-        <div class="teleport-controls">
-            <input type="text" id="teleportUrl" value="http://localhost:3001/shoppe/ye-olde-appe-shoppe.html" placeholder="URL to teleport from">
-            <button onclick="performTeleportation()">🚀 Teleport Content</button>
+
+        <!-- Teleportation Demo Panel (1/3 width) -->
+        <div class="teleportation-panel">
+            <div class="teleport-header">
+                <h2>📡 Teleportation Interface</h2>
+            </div>
+            
+            <div class="teleport-controls">
+                <input 
+                    type="text" 
+                    id="teleportUrl" 
+                    class="teleport-url-input"
+                    value="http://localhost:3001/ye-olde-appe-shoppe/ye-olde-appe-shoppe.html" 
+                    placeholder="URL to teleport from">
+                <button 
+                    id="teleportButton" 
+                    class="teleport-button" 
+                    onclick="performTeleportation()">
+                    🚀 Teleport Content
+                </button>
+            </div>
+            
+            <div class="status-area">
+                <div class="auto-teleport-notice">
+                    ✨ Auto-teleportation will start in 3 seconds...
+                </div>
+                
+                <div id="status" class="status" style="display: none;"></div>
+                
+                <h3 style="color: #ec4899; margin: 0 0 15px 0; font-size: 16px;">📥 Teleported Content:</h3>
+                <div id="teleportedContent" class="teleported-content">
+                    <p style="text-align: center; color: #a78bfa; margin-top: 4rem;">
+                        🌌 Preparing teleportation chamber...
+                    </p>
+                </div>
+                
+                <div id="metadata" class="metadata" style="display: none;"></div>
+            </div>
         </div>
-        
-        <div id="status" class="status" style="display: none;"></div>
-        
-        <h3>📥 Teleported Content:</h3>
-        <div id="teleportedContent" class="teleported-content">
-            <p style="text-align: center; color: #6b7280; margin-top: 4rem;">
-                Click "Teleport Content" to extract content from the source
-            </p>
-        </div>
-        
-        <div id="metadata" class="metadata" style="display: none;"></div>
     </div>
     
     <script>
+        let teleportationInProgress = false;
+        
         async function performTeleportation() {
+            if (teleportationInProgress) return;
+            
             const url = document.getElementById('teleportUrl').value;
             const statusEl = document.getElementById('status');
             const contentEl = document.getElementById('teleportedContent');
             const metadataEl = document.getElementById('metadata');
+            const buttonEl = document.getElementById('teleportButton');
+            
+            teleportationInProgress = true;
+            buttonEl.disabled = true;
+            buttonEl.textContent = '🔄 Teleporting...';
             
             // Show loading state
             statusEl.style.display = 'block';
             statusEl.className = 'status loading';
-            statusEl.textContent = '🔄 Teleporting content...';
+            statusEl.textContent = '🔄 Initializing headless browser and teleporting content...';
             
             try {
                 const response = await fetch('/teleport', {
@@ -206,20 +395,22 @@ app.get('/', (req, res) => {
                 if (result.valid) {
                     // Success
                     statusEl.className = 'status success';
-                    statusEl.textContent = '✅ Teleportation successful!';
+                    statusEl.textContent = '✅ Teleportation successful! Content extracted from <teleport> tags.';
                     
                     // Display content
                     contentEl.innerHTML = result.content;
+                    contentEl.classList.add('has-content');
                     
                     // Display metadata
                     metadataEl.style.display = 'block';
                     metadataEl.innerHTML = \`
-                        <strong>Metadata:</strong><br>
-                        Type: \${result.type}<br>
-                        Attributes: \${JSON.stringify(result.attributes, null, 2)}<br>
-                        Extracted at: \${result.extractedAt}<br>
-                        Source: \${result.metadata?.url}<br>
-                        Title: \${result.metadata?.title}
+                        <h4>📊 Teleportation Metadata</h4>
+                        <strong>Type:</strong> \${result.type}<br>
+                        <strong>Attributes:</strong><br>
+                        <pre>\${JSON.stringify(result.attributes, null, 2)}</pre>
+                        <strong>Extracted At:</strong> \${result.extractedAt}<br>
+                        <strong>Source URL:</strong> \${result.metadata?.url || 'N/A'}<br>
+                        <strong>Page Title:</strong> \${result.metadata?.title || 'N/A'}
                     \`;
                     
                 } else {
@@ -232,21 +423,48 @@ app.get('/', (req, res) => {
                 statusEl.textContent = '❌ Teleportation failed: ' + error.message;
                 
                 contentEl.innerHTML = \`
-                    <p style="text-align: center; color: #dc2626; margin-top: 4rem;">
-                        Teleportation failed. Check the URL and try again.
+                    <p style="text-align: center; color: #ef4444; margin-top: 4rem;">
+                        💥 Teleportation chamber malfunction!<br>
+                        <small>\${error.message}</small>
                     </p>
                 \`;
+                contentEl.classList.remove('has-content');
                 
                 metadataEl.style.display = 'none';
+            } finally {
+                teleportationInProgress = false;
+                buttonEl.disabled = false;
+                buttonEl.textContent = '🚀 Teleport Content';
             }
         }
         
-        // Auto-load demo on page load
+        // Auto-teleport after page load
         window.addEventListener('load', () => {
-            setTimeout(() => {
-                console.log('Auto-performing demo teleportation...');
+            let countdown = 3;
+            const noticeEl = document.querySelector('.auto-teleport-notice');
+            
+            const countdownTimer = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    noticeEl.textContent = \`✨ Auto-teleportation will start in \${countdown} second\${countdown !== 1 ? 's' : ''}...\`;
+                } else {
+                    noticeEl.textContent = '🚀 Starting auto-teleportation...';
+                    clearInterval(countdownTimer);
+                    
+                    setTimeout(() => {
+                        noticeEl.style.display = 'none';
+                        console.log('🚀 Auto-performing teleportation...');
+                        performTeleportation();
+                    }, 500);
+                }
+            }, 1000);
+        });
+        
+        // Allow Enter key to trigger teleportation
+        document.getElementById('teleportUrl').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !teleportationInProgress) {
                 performTeleportation();
-            }, 2000);
+            }
         });
     </script>
 </body>
@@ -254,7 +472,7 @@ app.get('/', (req, res) => {
   `);
 });
 
-// Teleportation endpoint
+// Teleportation endpoint (unchanged)
 app.post('/teleport', express.json(), async (req, res) => {
   try {
     const { url } = req.body;
@@ -373,10 +591,11 @@ app.get('/api/teleport', async (req, res) => {
 
 // Start server
 app.listen(port, () => {
-  console.log(`🚀 Teleportation Demo Server running at http://localhost:${port}`);
+  console.log(`🚀 Live Teleportation Demo Server running at http://localhost:${port}`);
   console.log(`📊 Health check: http://localhost:${port}/health`);
-  console.log(`🏰 Ye Olde Appe Shoppe: http://localhost:${port}/shoppe/ye-olde-appe-shoppe.html`);
-  console.log(`🌐 Demo page: http://localhost:${port}/`);
+  console.log(`🏰 Ye Olde Appe Shoppe: http://localhost:${port}/ye-olde-appe-shoppe/ye-olde-appe-shoppe.html`);
+  console.log(`🌐 Live Demo: http://localhost:${port}/`);
+  console.log(`✨ Side-by-side teleportation demo ready!`);
 });
 
 // Graceful shutdown

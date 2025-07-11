@@ -147,8 +147,11 @@ class HeadlessBrowserTeleporter {
   }
 
   async setupTeleportationAPI(page, options) {
+console.log('###### setupTeleportationAPI has been called');
     // Inject teleportation API into the page
+try {
     await page.evaluateOnNewDocument((opts) => {
+console.log('[][][][] page has been evaluated');
       window.__TELEPORTATION__ = {
         ready: false,
         data: null,
@@ -183,10 +186,12 @@ class HeadlessBrowserTeleporter {
           };
         }
       };
+console.log('Defining auto detection');
       
-      // Auto-ready detection after page load
-      window.addEventListener('load', () => {
-        setTimeout(() => {
+      // Auto-ready detection - handle both loaded and loading states
+      function setupAutoDetection() {
+console.log('&*^%$^@ running setup auto detection');
+        function runAutoDetection() {
           if (!window.__TELEPORTATION__.ready) {
             console.log('🚀 Auto-detecting <teleport> tag...');
             const teleportContent = window.__TELEPORTATION__.extractTeleportTag();
@@ -198,37 +203,242 @@ class HeadlessBrowserTeleporter {
                 timestamp: Date.now()
               });
             } else {
-              console.log('❌ No <teleport> tag found');
+              console.log('❌ No <teleport> tag found in auto-detection');
             }
           }
-        }, opts.autoDetectDelay || 2000);
-      });
+        }
+        
+        // Check if page is already loaded
+        if (document.readyState === 'complete') {
+          console.log('📄 Document already loaded, running auto-detection immediately');
+          setTimeout(runAutoDetection, opts.autoDetectDelay || 2000);
+        } else if (document.readyState === 'interactive') {
+          console.log('📄 Document interactive, running auto-detection soon');
+          setTimeout(runAutoDetection, Math.min(opts.autoDetectDelay || 2000, 1000));
+        } else {
+          console.log('📄 Document still loading, waiting for load event');
+          window.addEventListener('load', () => {
+            setTimeout(runAutoDetection, opts.autoDetectDelay || 2000);
+          });
+        }
+        
+        // Also listen for DOMContentLoaded as a backup
+        if (document.readyState === 'loading') {
+          window.addEventListener('DOMContentLoaded', () => {
+            console.log('📄 DOM content loaded, trying auto-detection');
+            setTimeout(runAutoDetection, Math.min(opts.autoDetectDelay || 2000, 1500));
+          });
+        }
+      }
+      
+      // Start auto-detection setup
+      setupAutoDetection();
+      
+      // Also do an immediate check in case teleport tag already exists
+      setTimeout(() => {
+        if (!window.__TELEPORTATION__.ready) {
+          console.log('🔍 Immediate teleport tag check...');
+          const teleportContent = window.__TELEPORTATION__.extractTeleportTag();
+          if (teleportContent) {
+            console.log('✅ Found teleport tag in immediate check');
+            window.__TELEPORTATION__.signalReady({
+              type: 'immediate-teleport-tag',
+              content: teleportContent.html,
+              attributes: teleportContent.attributes,
+              timestamp: Date.now()
+            });
+          }
+        }
+      }, 500); // Very short delay to allow DOM to settle
       
     }, options);
+} catch(err) {
+console.warn('That await you wrapped is erroring with this: ', err);
+}
   }
 
   async waitForTeleportationReady(page, options) {
     const timeout = options.readyTimeout || this.renderTimeout;
     
+    // First, let's debug what's on the page
+    console.log('🔍 Debugging page content...');
+    
+    const pageInfo = await page.evaluate(() => {
+      const teleportTag = document.querySelector('teleport');
+      return {
+        title: document.title,
+        url: window.location.href,
+        hasTeleportTag: !!teleportTag,
+        teleportTagContent: teleportTag ? teleportTag.innerHTML.substring(0, 200) + '...' : null,
+        teleportTagAttributes: teleportTag ? Object.fromEntries(
+          Array.from(teleportTag.attributes).map(attr => [attr.name, attr.value])
+        ) : null,
+        bodyContent: document.body.innerHTML.substring(0, 500) + '...',
+        hasTeportationAPI: typeof window.__TELEPORTATION__ !== 'undefined',
+        teleportationReady: window.__TELEPORTATION__ ? window.__TELEPORTATION__.ready : false
+      };
+    });
+    
+    console.log('📊 Page debug info:', pageInfo);
+    
+    // If we found a teleport tag immediately, try to signal ready
+    if (pageInfo.hasTeleportTag) {
+      console.log('✅ Found teleport tag immediately, attempting ready signal...');
+      
+      try {
+        const immediateResult = await page.evaluate(() => {
+          const teleportTag = document.querySelector('teleport');
+          if (teleportTag && window.__TELEPORTATION__) {
+            const teleportData = {
+              type: 'immediate-detection',
+              content: teleportTag.innerHTML,
+              attributes: Object.fromEntries(
+                Array.from(teleportTag.attributes).map(attr => [attr.name, attr.value])
+              ),
+              timestamp: Date.now()
+            };
+            
+            window.__TELEPORTATION__.signalReady(teleportData);
+            return teleportData;
+          }
+          return null;
+        });
+        
+        if (immediateResult) {
+          console.log('✅ Immediate teleportation successful');
+          
+          const metadata = await page.evaluate(() => ({
+            title: document.title,
+            url: window.location.href,
+            viewport: {
+              width: window.innerWidth,
+              height: window.innerHeight
+            },
+            timestamp: Date.now()
+          }));
+          
+          return {
+            valid: true,
+            type: 'immediate-detection',
+            ...immediateResult,
+            metadata,
+            extractedAt: new Date().toISOString()
+          };
+        }
+      } catch (err) {
+        console.warn('⚠️ Immediate detection failed, falling back to timeout wait:', err.message);
+      }
+    }
+    
     try {
-      // Wait for teleportation ready signal
+      // Wait for teleportation ready signal with enhanced logging
       const teleportData = await page.evaluate(async (timeoutMs) => {
         return new Promise((resolve, reject) => {
           const timeoutId = setTimeout(() => {
-            reject(new Error('Teleportation ready timeout'));
+            // Provide debug info on timeout
+            const teleportTag = document.querySelector('teleport');
+            const debugInfo = {
+              hasTeleportTag: !!teleportTag,
+              teleportTagHTML: teleportTag ? teleportTag.outerHTML.substring(0, 300) : 'No teleport tag',
+              teleportationAPI: typeof window.__TELEPORTATION__ !== 'undefined',
+              readyState: window.__TELEPORTATION__ ? window.__TELEPORTATION__.ready : 'No API',
+              documentReady: document.readyState,
+              imagesCount: document.querySelectorAll('img').length,
+              scriptsCount: document.querySelectorAll('script').length
+            };
+            
+            reject(new Error(`Teleportation ready timeout. Debug: ${JSON.stringify(debugInfo)}`));
           }, timeoutMs);
           
           // Listen for ready signal
           window.addEventListener('teleportationReady', (event) => {
+            console.log('📡 Received teleportationReady event');
             clearTimeout(timeoutId);
             resolve(event.detail);
           });
           
           // Check if already ready
           if (window.__TELEPORTATION__ && window.__TELEPORTATION__.ready) {
+            console.log('📡 Already ready, using existing data');
             clearTimeout(timeoutId);
             resolve(window.__TELEPORTATION__.data);
           }
+          
+          // Enhanced auto-detection with more aggressive retries
+          let retryCount = 0;
+          const maxRetries = 10; // Increased retries
+          
+          function tryAutoDetection() {
+            retryCount++;
+            console.log(`🔍 Auto-detection attempt ${retryCount}/${maxRetries}`);
+            
+            const teleportTag = document.querySelector('teleport');
+            if (teleportTag) {
+              console.log('✅ Found teleport tag in auto-detection');
+              const teleportData = {
+                type: 'auto-detected',
+                content: teleportTag.innerHTML,
+                attributes: Object.fromEntries(
+                  Array.from(teleportTag.attributes).map(attr => [attr.name, attr.value])
+                ),
+                timestamp: Date.now(),
+                detectionAttempt: retryCount
+              };
+              
+              clearTimeout(timeoutId);
+              resolve(teleportData);
+              return;
+            } else {
+              console.log(`❌ No teleport tag found on attempt ${retryCount}`);
+              
+              // Debug: log what we do find
+              const allElements = document.querySelectorAll('*');
+              const elementTypes = [...new Set(Array.from(allElements).map(el => el.tagName.toLowerCase()))];
+              console.log(`🔍 Available element types: ${elementTypes.slice(0, 10).join(', ')}${elementTypes.length > 10 ? '...' : ''}`);
+              
+              // Check for iframe content that might contain teleport tags
+              const iframes = document.querySelectorAll('iframe');
+              if (iframes.length > 0) {
+                console.log(`🖼️ Found ${iframes.length} iframe(s), checking for teleport tags...`);
+                for (let i = 0; i < iframes.length; i++) {
+                  try {
+                    const iframeDoc = iframes[i].contentDocument;
+                    if (iframeDoc) {
+                      const iframeTeleport = iframeDoc.querySelector('teleport');
+                      if (iframeTeleport) {
+                        console.log(`✅ Found teleport tag in iframe ${i}`);
+                        const teleportData = {
+                          type: 'iframe-teleport',
+                          content: iframeTeleport.innerHTML,
+                          attributes: Object.fromEntries(
+                            Array.from(iframeTeleport.attributes).map(attr => [attr.name, attr.value])
+                          ),
+                          timestamp: Date.now(),
+                          detectionAttempt: retryCount,
+                          iframeIndex: i
+                        };
+                        
+                        clearTimeout(timeoutId);
+                        resolve(teleportData);
+                        return;
+                      }
+                    }
+                  } catch (e) {
+                    console.log(`⚠️ Cannot access iframe ${i} content (cross-origin?):`, e.message);
+                  }
+                }
+              }
+            }
+            
+            if (retryCount < maxRetries) {
+              setTimeout(tryAutoDetection, 1000); // Try again in 1 second
+            } else {
+              console.log(`❌ Exhausted all ${maxRetries} auto-detection attempts`);
+            }
+          }
+          
+          // Start auto-detection immediately, then with retries
+          setTimeout(tryAutoDetection, 100); // Very quick first attempt
         });
       }, timeout);
 
@@ -267,32 +477,54 @@ class HeadlessBrowserTeleporter {
     } catch (error) {
       console.error('Failed to wait for teleportation ready:', error);
       
-      // Fallback extraction
-      const fallbackContent = await page.evaluate(() => {
+      // Enhanced fallback extraction with detailed logging
+      console.log('🔄 Attempting enhanced fallback extraction...');
+      
+      const fallbackInfo = await page.evaluate(() => {
         const teleportTag = document.querySelector('teleport');
+        
+        const info = {
+          teleportTag: null,
+          allTeleportTags: document.querySelectorAll('teleport').length,
+          documentReady: document.readyState,
+          bodyHTML: document.body.innerHTML.substring(0, 1000),
+          hasImages: document.querySelectorAll('img').length,
+          hasScripts: document.querySelectorAll('script').length,
+          errorDetails: 'No teleport tag found'
+        };
+        
         if (teleportTag) {
-          return {
+          info.teleportTag = {
             html: teleportTag.innerHTML,
+            outerHTML: teleportTag.outerHTML.substring(0, 500),
             attributes: Object.fromEntries(
               Array.from(teleportTag.attributes).map(attr => [attr.name, attr.value])
-            )
+            ),
+            bounds: teleportTag.getBoundingClientRect(),
+            hasContent: teleportTag.innerHTML.trim().length > 0
           };
+          info.errorDetails = 'Teleport tag found but ready signal failed';
         }
-        return null;
+        
+        return info;
       });
       
-      if (fallbackContent) {
+      console.log('📊 Fallback debug info:', fallbackInfo);
+      
+      if (fallbackInfo.teleportTag && fallbackInfo.teleportTag.hasContent) {
+        console.log('✅ Found teleport tag in fallback, using its content');
         return {
           valid: true,
           type: 'fallback-teleport-tag',
-          content: fallbackContent.html,
-          attributes: fallbackContent.attributes,
+          content: fallbackInfo.teleportTag.html,
+          attributes: fallbackInfo.teleportTag.attributes,
           error: error.message,
+          debugInfo: fallbackInfo,
           extractedAt: new Date().toISOString()
         };
       }
       
-      throw error;
+      throw new Error(`Teleportation failed: ${error.message}. Debug: ${JSON.stringify(fallbackInfo)}`);
     }
   }
 

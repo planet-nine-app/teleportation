@@ -1,24 +1,24 @@
 // App Shoppe Logic - Main Application JavaScript
 // Uses external component libraries: pn, bn, fn, hn, vs
 
-// Default configurations based on your structure
+// Default configurations based on your structure - NOW WITH LIGHT THEME DEFAULT
 const defaultConfigs = {
     styling: {
         "colors": {
-            "primary": "#8b5cf6",
-            "secondary": "#a855f7",
-            "accent": "#c084fc",
-            "background": "#1f2937",
-            "text": "#e5e7eb",
-            "textSecondary": "#9ca3af",
-            "border": "#374151"
+            "primary": "#0316FC",
+            "secondary": "#FCFC03",
+            "accent": "#a78bfa",
+            "background": "#E1E0DD",
+            "text": "#1f2937",
+            "textSecondary": "#6b7280",
+            "border": "#7C7C7C"
         },
-        "borderRadius": "8px",
-        "containerBorderRadius": "12px",
+        "borderRadius": "0px",
+        "containerBorderRadius": "0px",
         "containerPadding": "16px",
         "sectionGap": "12px",
         "textGap": "8px",
-        "imagePadding": "4px",
+        "imagePadding": "8px",
         "fontSizes": {
             "name": "18px",
             "description": "14px",
@@ -45,7 +45,7 @@ const defaultConfigs = {
         "apiBaseUrl": "/api",
         "userUuid": "user-123",
         "debugMode": false,
-        "theme": "dark",
+        "theme": "light",  // CHANGED FROM "dark" TO "light"
         "locale": "en-US"
     },
     posts: {
@@ -70,7 +70,7 @@ const defaultConfigs = {
         }
     },
     forms: {
-        "theme": "dark",
+        "theme": "light",  // CHANGED FROM "dark" TO "light"
         "fieldTypes": {
             "text": {
                 "supportedTypes": ["text", "email", "tel", "url", "password"],
@@ -106,7 +106,7 @@ const defaultConfigs = {
         },
         "styling": {
             "borderRadius": "8px",
-            "focusColor": "#8b5cf6",
+            "focusColor": "#0316FC",
             "errorColor": "#ef4444",
             "successColor": "#10b981"
         },
@@ -383,7 +383,7 @@ function updatePreview() {
     document.getElementById('previewFrame').srcdoc = previewHTML;
 }
 
-// Fixed generatePreviewHTML function with proper config passing
+// Fixed generatePreviewHTML function with proper config passing and dynamic teleport theme
 function generatePreviewHTML(configs) {
     const styling = configs.styling;
     const settings = configs.settings;
@@ -412,6 +412,9 @@ function generatePreviewHTML(configs) {
     const contentBg = styling.colors.background || '#f5f5f5';
     const cardBg = isLightBg ? '#ffffff' : (styling.colors.border || '#374151');
     const cardBorder = styling.colors.border || (isLightBg ? '#e5e7eb' : '#4b5563');
+
+    // Get the current theme for teleport tag
+    const currentTheme = settings.theme || 'light';
 
     return `
 <!DOCTYPE html>
@@ -634,7 +637,7 @@ function generatePreviewHTML(configs) {
             <div class="app-content">
                 <div class="home-content">
                     <div id="home-button-container"></div>
-                    <teleport data-app="ye-olde-appe-shoppe" data-theme="dark">
+                    <teleport data-app="ye-olde-appe-shoppe" data-theme="${currentTheme}" data-version="1.0.0" data-feed-type="posts">
                         <div class="post-feed" id="home-post-feed"></div>
                     </teleport>
                 </div>
@@ -657,7 +660,9 @@ function generatePreviewHTML(configs) {
             <div class="app-header" id="manage-posts-header"></div>
             <div class="app-content">
                 <div class="manage-posts-content">
-                    <div class="post-feed" id="manage-post-feed"></div>
+                    <teleport data-app="ye-olde-appe-shoppe" data-theme="${currentTheme}" data-version="1.0.0" data-feed-type="manage">
+                        <div class="post-feed" id="manage-post-feed"></div>
+                    </teleport>
                 </div>
             </div>
             <div class="app-footer" id="manage-footer"></div>
@@ -743,7 +748,7 @@ function generatePreviewHTML(configs) {
 
             // Form widget config
             formConfig: {
-                theme: '${settings.theme || 'dark'}',
+                theme: '${settings.theme || 'light'}',
                 colors: {
                     primary: '${styling.colors.primary || '#8b5cf6'}',
                     secondary: '${styling.colors.secondary || '#10b981'}',
@@ -1663,3 +1668,10 @@ window.exportAllConfigs = exportAllConfigs;
 window.saveAllConfigs = saveAllConfigs;
 window.loadSavedConfigs = loadSavedConfigs;
 window.loadDefaultConfigs = loadDefaultConfigs;
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
