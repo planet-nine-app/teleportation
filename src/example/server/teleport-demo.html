@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teleportation Demo - Planet Nine</title>
+    <style>
+        /* Hide teleport tags - they're for machine consumption, not display */
+        teleport, teleportal, feed-meta {
+            display: none !important;
+        }
+
+        /* Also hide any text content that might leak through */
+        teleport * {
+            display: none !important;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .teleport-controls {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .control-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            color: white;
+            font-weight: bold;
+            min-width: 80px;
+        }
+
+        .control-group input, .control-group select {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .teleport-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .teleport-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .teleport-btn:active {
+            transform: translateY(0);
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            margin: 20px 0;
+        }
+
+        .feed-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .teleportal-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            animation: teleportIn 0.6s ease-out;
+        }
+
+        .teleportal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+        }
+
+        @keyframes teleportIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.8) translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #f39c12, #e74c3c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .card-description {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .card-price {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 15px;
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .tag {
+            background: #ecf0f1;
+            color: #34495e;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+
+        .teleport-to-btn {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .teleport-to-btn:hover {
+            background: linear-gradient(45deg, #2980b9, #1abc9c);
+        }
+
+        .error {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .feed-info {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #27ae60;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Embedded Teleportation Feed -->
+    <teleport id="demo-store-feed" type="feed" category="retail">
+        <feed-meta>
+            <title>Demo Store - Kitchen Essentials</title>
+            <description>Amazing kitchen tools and gadgets for the modern cook</description>
+            <last-updated>2025-07-16T10:30:00Z</last-updated>
+            <source-url>https://demo-store.example.com</source-url>
+        </feed-meta>
+        
+        <teleportal id="spatula-pro" category="kitchen" price="19.99" currency="USD" 
+                  title="Professional Spatula Set" 
+                  description="Get every last drop with our premium spatula collection. Perfect for jars, bottles, and containers."
+                  url="https://demo-store.example.com/spatula-pro"
+                  image-url="https://demo-store.example.com/images/spatula-pro.jpg"
+                  tags="kitchen,tools,spatula,cooking,professional"
+                  in-stock="true"
+                  rating="4.8">
+        </teleportal>
+        
+        <teleportal id="silicone-scraper" category="kitchen" price="12.99" currency="USD"
+                  title="Silicone Bowl Scraper"
+                  description="Flexible silicone scraper that gets into every corner. Heat resistant up to 450°F."
+                  url="https://demo-store.example.com/silicone-scraper" 
+                  image-url="https://demo-store.example.com/images/scraper.jpg"
+                  tags="kitchen,silicone,scraper,baking,heat-resistant"
+                  in-stock="true"
+                  rating="4.6">
+        </teleportal>
+        
+        <teleportal id="jar-opener" category="kitchen" price="24.99" currency="USD"
+                  title="Universal Jar Opener"
+                  description="Never struggle with stuck jars again! Works on any size jar or bottle."
+                  url="https://demo-store.example.com/jar-opener"
+                  image-url="https://demo-store.example.com/images/jar-opener.jpg" 
+                  tags="kitchen,opener,jar,accessibility,universal"
+                  in-stock="true"
+                  rating="4.9">
+        </teleportal>
+        
+        <teleportal id="kitchen-bundle" category="kitchen" price="49.99" currency="USD"
+                  title="Complete Kitchen Starter Kit"
+                  description="Everything you need: spatulas, scrapers, jar opener, and measuring spoons. Save 25%!"
+                  url="https://demo-store.example.com/kitchen-bundle"
+                  image-url="https://demo-store.example.com/images/bundle.jpg"
+                  tags="kitchen,bundle,starter,complete,savings"
+                  in-stock="true"
+                  rating="4.7"
+                  special-offer="25% off when bought together">
+        </teleportal>
+    </teleport>
+
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Teleportation Demo</h1>
+            <p>This page contains a teleportable feed - others can teleport our content!</p>
+        </div>
+
+        <div class="teleport-controls">
+            <div style="text-align: center; margin-bottom: 20px; color: white;">
+                <div style="background: rgba(46, 204, 113, 0.2); padding: 10px; border-radius: 8px; border: 1px solid #2ecc71;">
+                    📡 <strong>This page contains teleportable content!</strong> Other systems can teleport our feed.
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <label for="feedUrl">Feed URL:</label>
+                <input type="text" id="feedUrl" value="embedded://local-teleport-feed" placeholder="Enter teleportation feed URL">
+            </div>
+            
+            <div class="control-group">
+                <label for="category">Category:</label>
+                <select id="category">
+                    <option value="">All Categories</option>
+                    <option value="kitchen">Kitchen</option>
+                    <option value="tools">Tools</option>
+                    <option value="electronics">Electronics</option>
+                </select>
+
+                <label for="searchTerm">Search:</label>
+                <input type="text" id="searchTerm" placeholder="Search teleportals...">
+            </div>
+
+            <div style="text-align: center;">
+                <button class="teleport-btn" onclick="initiateTeleportation()" style="margin-right: 10px;">
+                    ⚡ Initiate Teleportation ⚡
+                </button>
+                <button class="teleport-btn" onclick="loadEmbeddedFeed()" style="background: linear-gradient(45deg, #2ecc71, #27ae60); margin-right: 10px;">
+                    📡 Load Local Feed
+                </button>
+                <button class="teleport-btn" onclick="testEmbeddedAPI()" style="background: linear-gradient(45deg, #9b59b6, #8e44ad);">
+                    🔗 Test Embedded API
+                </button>
+            </div>
+        </div>
+
+        <div id="feedInfo" class="feed-info" style="display: none;">
+            <div><span class="status-indicator"></span><strong>Connected to:</strong> <span id="feedTitle"></span></div>
+            <div><strong>Description:</strong> <span id="feedDescription"></span></div>
+            <div><strong>Last Updated:</strong> <span id="feedUpdated"></span></div>
+            <div><strong>Teleportals Found:</strong> <span id="teleportalCount"></span></div>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            🌀 Teleporting through cyberspace...
+        </div>
+
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div id="feedContainer" class="feed-container"></div>
+    </div>
+
+    <script>
+        let currentFeed = null;
+
+        async function initiateTeleportation() {
+            const feedUrl = document.getElementById('feedUrl').value;
+            const category = document.getElementById('category').value;
+            const searchTerm = document.getElementById('searchTerm').value;
+            
+            // Check if we're using the embedded feed
+            if (feedUrl === 'embedded://local-teleport-feed' || feedUrl === '') {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('error').style.display = 'none';
+                document.getElementById('feedContainer').innerHTML = '';
+                
+                setTimeout(() => {
+                    const feed = parseEmbeddedTeleportFeed();
+                    if (feed) {
+                        // Apply filters to embedded feed
+                        let filteredFeed = { ...feed };
+                        if (category || searchTerm) {
+                            filteredFeed.teleportals = feed.teleportals.filter(teleportal => {
+                                if (category && teleportal.category !== category) return false;
+                                if (searchTerm) {
+                                    const searchLower = searchTerm.toLowerCase();
+                                    return teleportal.title.toLowerCase().includes(searchLower) ||
+                                           teleportal.description.toLowerCase().includes(searchLower) ||
+                                           teleportal.tags.some(t => t.toLowerCase().includes(searchLower));
+                                }
+                                return true;
+                            });
+                        }
+                        
+                        currentFeed = filteredFeed;
+                        document.getElementById('loading').style.display = 'none';
+                        displayFeedInfo(filteredFeed);
+                        displayTeleportals(filteredFeed.teleportals);
+                    }
+                }, 800); // Simulate loading time
+                return;
+            }
+            
+            // Show loading state
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('feedContainer').innerHTML = '';
+            document.getElementById('feedInfo').style.display = 'none';
+
+            try {
+                // Build query parameters
+                const params = new URLSearchParams();
+                if (category) params.append('category', category);
+                if (searchTerm) params.append('search', searchTerm);
+                
+                const queryString = params.toString();
+                const fullUrl = queryString ? `${feedUrl}?${queryString}` : feedUrl;
+
+                // Fetch the teleportation feed
+                const response = await fetch(fullUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch feed: ${response.statusText}`);
+                }
+
+                const feed = await response.json();
+                currentFeed = feed;
+
+                // Hide loading
+                document.getElementById('loading').style.display = 'none';
+
+                // Show feed info
+                displayFeedInfo(feed);
+
+                // Display teleportals
+                displayTeleportals(feed.teleportals);
+
+            } catch (error) {
+                console.error('Teleportation failed:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = `Teleportation failed: ${error.message}`;
+            }
+        }
+
+        function displayFeedInfo(feed) {
+            document.getElementById('feedTitle').textContent = feed.title;
+            document.getElementById('feedDescription').textContent = feed.description;
+            document.getElementById('feedUpdated').textContent = new Date(feed.lastUpdated).toLocaleString();
+            document.getElementById('teleportalCount').textContent = feed.teleportals.length;
+            document.getElementById('feedInfo').style.display = 'block';
+        }
+
+        function displayTeleportals(teleportals) {
+            const container = document.getElementById('feedContainer');
+            
+            if (teleportals.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: white; font-size: 18px;">No teleportals found in this dimension 🌌</div>';
+                return;
+            }
+
+            teleportals.forEach((teleportal, index) => {
+                const card = createTeleportalCard(teleportal);
+                card.style.animationDelay = `${index * 0.1}s`;
+                container.appendChild(card);
+            });
+        }
+
+        function createTeleportalCard(teleportal) {
+            const card = document.createElement('div');
+            card.className = 'teleportal-card';
+            
+            // Create rating stars if rating exists
+            let ratingHTML = '';
+            if (teleportal.rating && teleportal.rating > 0) {
+                const stars = '★'.repeat(Math.floor(teleportal.rating)) + '☆'.repeat(5 - Math.floor(teleportal.rating));
+                ratingHTML = `<div style="color: #f39c12; margin-bottom: 10px;">${stars} (${teleportal.rating})</div>`;
+            }
+            
+            // Create special offer badge if it exists
+            let specialOfferHTML = '';
+            if (teleportal.specialOffer) {
+                specialOfferHTML = `<div style="background: #e74c3c; color: white; padding: 5px 10px; border-radius: 15px; font-size: 0.8em; margin-bottom: 10px; text-align: center;">🎁 ${teleportal.specialOffer}</div>`;
+            }
+            
+            // Stock indicator
+            const stockHTML = teleportal.inStock !== undefined ? 
+                `<div style="color: ${teleportal.inStock ? '#27ae60' : '#e74c3c'}; font-size: 0.9em; margin-bottom: 10px;">
+                    ${teleportal.inStock ? '✅ In Stock' : '❌ Out of Stock'}
+                </div>` : '';
+            
+            // Create a nice icon based on product type
+            let productIcon = '📦';
+            const title = teleportal.title.toLowerCase();
+            if (title.includes('spatula')) productIcon = '🥄';
+            else if (title.includes('scraper')) productIcon = '🔧';
+            else if (title.includes('opener')) productIcon = '🔓';
+            else if (title.includes('bundle') || title.includes('kit')) productIcon = '📦';
+            
+            card.innerHTML = `
+                <div class="card-image">
+                    ${productIcon} ${teleportal.title.substring(0, 15)}${teleportal.title.length > 15 ? '...' : ''}
+                </div>
+                <div class="card-content">
+                    <div class="card-title">${teleportal.title}</div>
+                    ${ratingHTML}
+                    <div class="card-description">${teleportal.description}</div>
+                    <div class="card-price">${teleportal.price}</div>
+                    ${specialOfferHTML}
+                    ${stockHTML}
+                    <div class="card-tags">
+                        ${teleportal.tags.map(tag => `<span class="tag">${tag.trim()}</span>`).join('')}
+                    </div>
+                    <button class="teleport-to-btn" onclick="teleportTo('${teleportal.url}', '${teleportal.title}')" ${!teleportal.inStock && teleportal.inStock !== undefined ? 'disabled style="opacity: 0.5;"' : ''}>
+                        🌟 Teleport to ${teleportal.title}
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function teleportTo(url, title) {
+            // In a real implementation, this might do more sophisticated teleportation
+            // For demo purposes, we'll just open the URL
+            if (url.startsWith('http')) {
+                window.open(url, '_blank');
+            } else {
+                alert(`🚀 Teleporting to ${title}!\n\nIn a real implementation, this would navigate to: ${url}`);
+            }
+        }
+
+        // Function to parse embedded teleport tags
+        function parseEmbeddedTeleportFeed() {
+            const teleportTag = document.querySelector('teleport[type="feed"]');
+            if (!teleportTag) return null;
+
+            const feedMeta = teleportTag.querySelector('feed-meta');
+            const teleportals = teleportTag.querySelectorAll('teleportal');
+
+            const feed = {
+                id: teleportTag.id,
+                title: feedMeta.querySelector('title').textContent,
+                description: feedMeta.querySelector('description').textContent,
+                lastUpdated: feedMeta.querySelector('last-updated').textContent,
+                sourceUrl: feedMeta.querySelector('source-url').textContent,
+                teleportals: []
+            };
+
+            teleportals.forEach(teleportal => {
+                const item = {
+                    id: teleportal.id,
+                    title: teleportal.querySelector('title').textContent,
+                    description: teleportal.querySelector('description').textContent,
+                    price: `${teleportal.getAttribute('price')}`,
+                    category: teleportal.getAttribute('category'),
+                    url: teleportal.querySelector('url').textContent,
+                    imageUrl: teleportal.querySelector('image').textContent,
+                    tags: teleportal.querySelector('tags').textContent.split(','),
+                    inStock: teleportal.querySelector('in-stock').textContent === 'true',
+                    rating: parseFloat(teleportal.querySelector('rating').textContent),
+                    discoverable: true
+                };
+
+                // Add special offer if it exists
+                const specialOffer = teleportal.querySelector('special-offer');
+                if (specialOffer) {
+                    item.specialOffer = specialOffer.textContent;
+                }
+
+                feed.teleportals.push(item);
+            });
+
+            return feed;
+        }
+
+        // Function to load embedded feed
+        function loadEmbeddedFeed() {
+            console.log('Loading embedded feed...');
+            const feed = parseEmbeddedTeleportFeed();
+            console.log('Parsed feed:', feed);
+            
+            if (feed) {
+                currentFeed = feed;
+                displayFeedInfo(feed);
+                displayTeleportals(feed.teleportals);
+                
+                // Update the feed URL input to show we're using embedded feed
+                document.getElementById('feedUrl').value = 'embedded://local-teleport-feed';
+                
+                // Hide any error messages
+                document.getElementById('error').style.display = 'none';
+                document.getElementById('loading').style.display = 'none';
+            } else {
+                console.error('Failed to parse embedded feed');
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = 'Failed to parse embedded teleport feed. Check console for details.';
+            }
+        }
+
+        // Function to test the embedded feed API endpoint
+        function testEmbeddedAPI() {
+            document.getElementById('feedUrl').value = '/api/teleport/embedded-feed';
+            initiateTeleportation();
+        }
+
+        // Auto-load the embedded feed on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                loadEmbeddedFeed();
+            }, 500);
+        });
+
+        // Allow Enter key to trigger teleportation
+        document.getElementById('searchTerm').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                initiateTeleportation();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -589,6 +589,199 @@ app.get('/api/teleport', async (req, res) => {
   }
 });
 
+// Add this route to your demo-server.js
+// Make sure you have: const path = require('path');
+
+// Sample teleportation feed data
+const sampleFeed = {
+  id: "demo-feed-001",
+  title: "Demo Store Product Feed",
+  description: "A sample feed of products for teleportation discovery",
+  lastUpdated: new Date().toISOString(),
+  teleportals: [
+    {
+      id: "teleportal-001",
+      title: "Amazing Spatula Set",
+      description: "Perfect for getting every last bit out of containers",
+      price: "$19.99",
+      category: "kitchen",
+      url: "https://example.com/products/spatula-set",
+      imageUrl: "https://example.com/images/spatula.jpg",
+      discoverable: true,
+      tags: ["kitchen", "tools", "spatula", "cooking"]
+    },
+    {
+      id: "teleportal-002", 
+      title: "Non-Stick Cooking Spray",
+      description: "Works great with spatulas for easy cleanup",
+      price: "$7.99",
+      category: "kitchen",
+      url: "https://example.com/products/cooking-spray",
+      imageUrl: "https://example.com/images/spray.jpg", 
+      discoverable: true,
+      tags: ["kitchen", "cooking", "non-stick"]
+    },
+    {
+      id: "teleportal-003",
+      title: "Kitchen Starter Bundle", 
+      description: "Everything you need to get started cooking",
+      price: "$49.99",
+      category: "kitchen",
+      url: "https://example.com/products/starter-bundle",
+      imageUrl: "https://example.com/images/bundle.jpg",
+      discoverable: true,
+      tags: ["kitchen", "bundle", "starter", "cooking"]
+    }
+  ]
+};
+
+// Route to get the teleportation feed
+app.get('/api/teleport/feed', (req, res) => {
+  try {
+    // Add CORS headers for cross-origin teleportation
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    
+    // Optional filtering by category or tag
+    const { category, tag, search } = req.query;
+    let filteredFeed = { ...sampleFeed };
+    
+    if (category || tag || search) {
+      filteredFeed.teleportals = sampleFeed.teleportals.filter(teleportal => {
+        if (category && teleportal.category !== category) return false;
+        if (tag && !teleportal.tags.includes(tag)) return false;
+        if (search) {
+          const searchLower = search.toLowerCase();
+          return teleportal.title.toLowerCase().includes(searchLower) ||
+                 teleportal.description.toLowerCase().includes(searchLower) ||
+                 teleportal.tags.some(t => t.toLowerCase().includes(searchLower));
+        }
+        return true;
+      });
+    }
+    
+    res.json(filteredFeed);
+  } catch (error) {
+    console.error('Error serving teleportation feed:', error);
+    res.status(500).json({ error: 'Failed to load teleportation feed' });
+  }
+});
+
+// Route to get a specific teleportal by ID
+app.get('/api/teleport/teleportal/:id', (req, res) => {
+  try {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    
+    const teleportal = sampleFeed.teleportals.find(t => t.id === req.params.id);
+    
+    if (!teleportal) {
+      return res.status(404).json({ error: 'Teleportal not found' });
+    }
+    
+    res.json(teleportal);
+  } catch (error) {
+    console.error('Error serving teleportal:', error);
+    res.status(500).json({ error: 'Failed to load teleportal' });
+  }
+});
+
+// Route to serve the demo HTML page
+app.get('/demo/teleport', (req, res) => {
+  res.sendFile(path.join(__dirname, 'teleport-demo.html'));
+});
+
+// Add this if you want to support teleportation discovery
+app.get('/.well-known/teleportation', (req, res) => {
+  res.json({
+    version: "1.0",
+    feeds: [
+      {
+        url: "/api/teleport/feed",
+        title: "Demo Store Feed",
+        description: "Sample products for teleportation discovery"
+      }
+    ]
+  });
+});
+
+// Route to extract and serve embedded teleport feed as JSON
+app.get('/api/teleport/embedded-feed', (req, res) => {
+  try {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    
+    // This represents the embedded feed from the HTML page
+    const embeddedFeed = {
+      id: "demo-store-feed",
+      title: "Demo Store - Kitchen Essentials",
+      description: "Amazing kitchen tools and gadgets for the modern cook",
+      lastUpdated: new Date().toISOString(),
+      sourceUrl: "https://demo-store.example.com",
+      teleportals: [
+        {
+          id: "spatula-pro",
+          title: "Professional Spatula Set",
+          description: "Get every last drop with our premium spatula collection. Perfect for jars, bottles, and containers.",
+          price: "$19.99",
+          category: "kitchen",
+          url: "https://demo-store.example.com/spatula-pro",
+          imageUrl: "https://demo-store.example.com/images/spatula-pro.jpg",
+          tags: ["kitchen", "tools", "spatula", "cooking", "professional"],
+          inStock: true,
+          rating: 4.8,
+          discoverable: true
+        },
+        {
+          id: "silicone-scraper", 
+          title: "Silicone Bowl Scraper",
+          description: "Flexible silicone scraper that gets into every corner. Heat resistant up to 450°F.",
+          price: "$12.99",
+          category: "kitchen",
+          url: "https://demo-store.example.com/silicone-scraper",
+          imageUrl: "https://demo-store.example.com/images/scraper.jpg",
+          tags: ["kitchen", "silicone", "scraper", "baking", "heat-resistant"],
+          inStock: true,
+          rating: 4.6,
+          discoverable: true
+        },
+        {
+          id: "jar-opener",
+          title: "Universal Jar Opener", 
+          description: "Never struggle with stuck jars again! Works on any size jar or bottle.",
+          price: "$24.99",
+          category: "kitchen",
+          url: "https://demo-store.example.com/jar-opener",
+          imageUrl: "https://demo-store.example.com/images/jar-opener.jpg",
+          tags: ["kitchen", "opener", "jar", "accessibility", "universal"],
+          inStock: true,
+          rating: 4.9,
+          discoverable: true
+        },
+        {
+          id: "kitchen-bundle",
+          title: "Complete Kitchen Starter Kit",
+          description: "Everything you need: spatulas, scrapers, jar opener, and measuring spoons. Save 25%!",
+          price: "$49.99", 
+          category: "kitchen",
+          url: "https://demo-store.example.com/kitchen-bundle",
+          imageUrl: "https://demo-store.example.com/images/bundle.jpg",
+          tags: ["kitchen", "bundle", "starter", "complete", "savings"],
+          inStock: true,
+          rating: 4.7,
+          specialOffer: "25% off when bought together",
+          discoverable: true
+        }
+      ]
+    };
+
+    res.json(embeddedFeed);
+  } catch (error) {
+    console.error('Error serving embedded teleportation feed:', error);
+    res.status(500).json({ error: 'Failed to load embedded teleportation feed' });
+  }
+});
+
 // Start server
 app.listen(port, () => {
   console.log(`🚀 Live Teleportation Demo Server running at http://localhost:${port}`);
