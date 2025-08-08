@@ -10,8 +10,8 @@
             display: none !important;
         }
 
-        /* Also hide any text content that might leak through */
-        teleport * {
+        /* Also hide any content that might leak through from custom elements */
+        teleport *, teleportal *, feed-meta * {
             display: none !important;
         }
 
@@ -250,11 +250,10 @@
 <body>
     <!-- Embedded Teleportation Feed -->
     <teleport id="demo-store-feed" type="feed" category="retail">
-        <feed-meta>
-            <title>Demo Store - Kitchen Essentials</title>
-            <description>Amazing kitchen tools and gadgets for the modern cook</description>
-            <last-updated>2025-07-16T10:30:00Z</last-updated>
-            <source-url>https://demo-store.example.com</source-url>
+        <feed-meta title="Demo Store - Kitchen Essentials"
+                   description="Amazing kitchen tools and gadgets for the modern cook"
+                   last-updated="2025-07-16T10:30:00Z"
+                   source-url="https://demo-store.example.com">
         </feed-meta>
         
         <teleportal id="spatula-pro" category="kitchen" price="19.99" currency="USD" 
@@ -374,27 +373,38 @@
                 document.getElementById('feedContainer').innerHTML = '';
                 
                 setTimeout(() => {
-                    const feed = parseEmbeddedTeleportFeed();
-                    if (feed) {
-                        // Apply filters to embedded feed
-                        let filteredFeed = { ...feed };
-                        if (category || searchTerm) {
-                            filteredFeed.teleportals = feed.teleportals.filter(teleportal => {
-                                if (category && teleportal.category !== category) return false;
-                                if (searchTerm) {
-                                    const searchLower = searchTerm.toLowerCase();
-                                    return teleportal.title.toLowerCase().includes(searchLower) ||
-                                           teleportal.description.toLowerCase().includes(searchLower) ||
-                                           teleportal.tags.some(t => t.toLowerCase().includes(searchLower));
-                                }
-                                return true;
-                            });
+                    try {
+                        const feed = parseEmbeddedTeleportFeed();
+                        if (feed) {
+                            // Apply filters to embedded feed
+                            let filteredFeed = { ...feed };
+                            if (category || searchTerm) {
+                                filteredFeed.teleportals = feed.teleportals.filter(teleportal => {
+                                    if (category && teleportal.category !== category) return false;
+                                    if (searchTerm) {
+                                        const searchLower = searchTerm.toLowerCase();
+                                        return teleportal.title.toLowerCase().includes(searchLower) ||
+                                               teleportal.description.toLowerCase().includes(searchLower) ||
+                                               teleportal.tags.some(t => t.toLowerCase().includes(searchLower));
+                                    }
+                                    return true;
+                                });
+                            }
+                            
+                            currentFeed = filteredFeed;
+                            document.getElementById('loading').style.display = 'none';
+                            displayFeedInfo(filteredFeed);
+                            displayTeleportals(filteredFeed.teleportals);
+                        } else {
+                            document.getElementById('loading').style.display = 'none';
+                            document.getElementById('error').style.display = 'block';
+                            document.getElementById('error').textContent = 'Failed to parse embedded teleport feed.';
                         }
-                        
-                        currentFeed = filteredFeed;
+                    } catch (error) {
+                        console.error('Error processing embedded feed:', error);
                         document.getElementById('loading').style.display = 'none';
-                        displayFeedInfo(filteredFeed);
-                        displayTeleportals(filteredFeed.teleportals);
+                        document.getElementById('error').style.display = 'block';
+                        document.getElementById('error').textContent = `Error processing embedded feed: ${error.message}`;
                     }
                 }, 800); // Simulate loading time
                 return;
@@ -576,24 +586,31 @@
         // Function to load embedded feed
         function loadEmbeddedFeed() {
             console.log('Loading embedded feed...');
-            const feed = parseEmbeddedTeleportFeed();
-            console.log('Parsed feed:', feed);
             
-            if (feed) {
-                currentFeed = feed;
-                displayFeedInfo(feed);
-                displayTeleportals(feed.teleportals);
+            try {
+                const feed = parseEmbeddedTeleportFeed();
+                console.log('Parsed feed:', feed);
                 
-                // Update the feed URL input to show we're using embedded feed
-                document.getElementById('feedUrl').value = 'embedded://local-teleport-feed';
-                
-                // Hide any error messages
-                document.getElementById('error').style.display = 'none';
-                document.getElementById('loading').style.display = 'none';
-            } else {
-                console.error('Failed to parse embedded feed');
+                if (feed && feed.teleportals && feed.teleportals.length > 0) {
+                    currentFeed = feed;
+                    displayFeedInfo(feed);
+                    displayTeleportals(feed.teleportals);
+                    
+                    // Update the feed URL input to show we're using embedded feed
+                    document.getElementById('feedUrl').value = 'embedded://local-teleport-feed';
+                    
+                    // Hide any error messages
+                    document.getElementById('error').style.display = 'none';
+                    document.getElementById('loading').style.display = 'none';
+                } else {
+                    console.error('Failed to parse embedded feed or no teleportals found');
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('error').textContent = 'Failed to parse embedded teleport feed. No teleportals found.';
+                }
+            } catch (error) {
+                console.error('Error loading embedded feed:', error);
                 document.getElementById('error').style.display = 'block';
-                document.getElementById('error').textContent = 'Failed to parse embedded teleport feed. Check console for details.';
+                document.getElementById('error').textContent = `Error loading embedded feed: ${error.message}`;
             }
         }
 

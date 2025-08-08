@@ -691,20 +691,6 @@ app.get('/demo/teleport', (req, res) => {
   res.sendFile(path.join(__dirname, 'teleport-demo.html'));
 });
 
-// Add this if you want to support teleportation discovery
-app.get('/.well-known/teleportation', (req, res) => {
-  res.json({
-    version: "1.0",
-    feeds: [
-      {
-        url: "/api/teleport/feed",
-        title: "Demo Store Feed",
-        description: "Sample products for teleportation discovery"
-      }
-    ]
-  });
-});
-
 // Route to extract and serve embedded teleport feed as JSON
 app.get('/api/teleport/embedded-feed', (req, res) => {
   try {
@@ -780,6 +766,25 @@ app.get('/api/teleport/embedded-feed', (req, res) => {
     console.error('Error serving embedded teleportation feed:', error);
     res.status(500).json({ error: 'Failed to load embedded teleportation feed' });
   }
+});
+
+// Add this if you want to support teleportation discovery
+app.get('/.well-known/teleportation', (req, res) => {
+  res.json({
+    version: "1.0",
+    feeds: [
+      {
+        url: "/api/teleport/feed",
+        title: "Demo Store Feed",
+        description: "Sample products for teleportation discovery"
+      },
+      {
+        url: "/api/teleport/embedded-feed", 
+        title: "Embedded Demo Feed",
+        description: "Feed extracted from embedded teleport tags"
+      }
+    ]
+  });
 });
 
 // Start server
